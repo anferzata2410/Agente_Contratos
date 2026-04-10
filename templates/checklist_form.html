@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check List - Solicitud de Credito | Aluri</title>
+  <link rel="stylesheet" href="/static/css/styles.css?v=8">
+</head>
+<body>
+
+  <!-- ── Datalist de sugerencias para estado civil ── -->
+  <datalist id="opciones-estado-civil">
+    <option value="Soltero/a">
+    <option value="Soltero/a con union marital de hecho">
+    <option value="Soltero/a sin union marital de hecho">
+    <option value="Casado/a con sociedad conyugal vigente">
+    <option value="Casado/a con capitulaciones">
+    <option value="Union libre">
+    <option value="Divorciado/a">
+    <option value="Viudo/a">
+  </datalist>
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <h1>FORMULARIO DE SOLICITUD</h1>
+    <div class="subtitle">Check List - Informacion Requerida</div>
+  </header>
+
+  <div class="container">
+    <form id="checklist-form" onsubmit="event.preventDefault()">
+
+      <!-- ══════════ TIPO DE CONTRATO ══════════ -->
+      <div class="section">
+        <div class="section-header">TIPO DE CONTRATO</div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Tipo de contrato <span class="required">*</span></label>
+              <select id="tipo_contrato" required>
+                <option value="">Seleccionar...</option>
+                <option value="Hipoteca">Hipoteca</option>
+                <option value="Compraventa con Pacto de Retroventa">Compraventa con Pacto de Retroventa</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ DEUDORES ══════════ -->
+      <div class="section">
+        <div class="section-header">
+          INFORMACION DEL(LOS) DEUDOR(ES)
+          <span class="badge">OBLIGATORIO</span>
+        </div>
+        <div class="section-body">
+          <div id="deudores-container">
+            <!-- Se crea 1 deudor vacio al iniciar -->
+          </div>
+          <button type="button" class="add-btn" onclick="agregarDeudor()">
+            + Agregar Deudor
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════ CODEUDORES ══════════ -->
+      <div class="section">
+        <div class="section-header">
+          CODEUDORES
+          <span class="badge">OPCIONAL</span>
+        </div>
+        <div class="section-body">
+          <div id="codeudores-container">
+          </div>
+          <button type="button" class="add-btn" onclick="agregarCodeudor()">
+            + Agregar Codeudor
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════ ACREEDORES ══════════ -->
+      <div class="section">
+        <div class="section-header">
+          INFORMACION DE ACREEDORES
+          <span class="badge">OBLIGATORIO</span>
+        </div>
+        <div class="section-body">
+          <div id="acreedores-container">
+            <!-- Se crean 2 acreedores vacios al iniciar -->
+          </div>
+          <button type="button" class="add-btn" onclick="agregarAcreedor()">
+            + Agregar Acreedor
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════ INMUEBLE ══════════ -->
+      <div class="section">
+        <div class="section-header">INFORMACION DEL INMUEBLE</div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>No. Matricula Inmobiliaria <span class="required">*</span></label>
+              <input type="text" id="inmueble_matricula" placeholder="50S-XXXXXX">
+            </div>
+            <div class="field">
+              <label>Cedula catastral</label>
+              <input type="text" id="inmueble_cedula_catastral" placeholder="BS 23S 61 44 2">
+            </div>
+            <div class="field">
+              <label>Codigo CHIP</label>
+              <input type="text" id="inmueble_chip" placeholder="AAA0000XXXX">
+            </div>
+            <div class="field full-width">
+              <label>Direccion del inmueble <span class="required">*</span></label>
+              <input type="text" id="inmueble_direccion" placeholder="Direccion completa del inmueble">
+            </div>
+            <div class="field full-width">
+              <label>Descripcion del inmueble</label>
+              <textarea id="inmueble_descripcion" rows="4" placeholder="Area, numero de pisos, distribucion, etc."></textarea>
+            </div>
+            <div class="field full-width">
+              <label>Linderos</label>
+              <textarea id="inmueble_linderos" rows="4" placeholder="Linderos del inmueble segun escritura"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ CONDICIONES DEL PRESTAMO ══════════ -->
+      <div class="section">
+        <div class="section-header">
+          CONDICIONES DEL PRESTAMO
+          <span class="badge">OBLIGATORIO</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Monto del prestamo <span class="required">*</span></label>
+              <input type="text" id="prestamo_monto" placeholder="180.000.000" readonly>
+            </div>
+            <div class="field">
+              <label>Plazo (meses) <span class="required">*</span></label>
+              <input type="number" id="prestamo_plazo" placeholder="60" min="1" max="360">
+            </div>
+            <div class="field">
+              <label>Tasa mensual anticipada <span class="required">*</span></label>
+              <input type="text" id="prestamo_tasa" placeholder="1.80%">
+            </div>
+            <div class="field">
+              <label>Valor cuota mensual</label>
+              <input type="text" id="prestamo_cuota" placeholder="3.240.000" oninput="formatearMonto(this)">
+            </div>
+            <div class="field">
+              <label>Forma de pago <span class="required">*</span></label>
+              <select id="prestamo_forma_pago">
+                <option value="">Seleccionar...</option>
+                <option value="Solo intereses">Solo intereses</option>
+                <option value="Interes y capital">Interes y capital</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Comision Aluri</label>
+              <input type="text" id="prestamo_comision" placeholder="9.000.000" readonly>
+            </div>
+            <div class="field full-width">
+              <label>Observaciones</label>
+              <textarea id="prestamo_observaciones" rows="3" placeholder="Condiciones especiales, notas adicionales..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ── Input oculto para subir archivos ── -->
+  <input type="file" id="archivo-checklist" accept=".docx" style="display:none" onchange="cargarArchivoSeleccionado()">
+
+  <!-- ── Barra de acciones fija ── -->
+  <div class="actions-bar">
+    <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+      Limpiar
+    </button>
+    <button type="button" class="btn btn-primary" id="btn-cargar" onclick="cargarCheckList()">
+      Cargar Check List (.docx)
+    </button>
+    <button type="button" class="btn btn-success" id="btn-generar-docx" onclick="generarContrato('docx')">
+      Descargar Contrato (.docx)
+    </button>
+    <button type="button" class="btn btn-pdf" id="btn-generar-pdf" onclick="generarContrato('pdf')">
+      Descargar Formulario (.pdf)
+    </button>
+  </div>
+
+  <!-- ── Loading overlay ── -->
+  <div id="loading-overlay" class="loading-overlay" style="display:none">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <p id="loading-text">Procesando...</p>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js?v=9"></script>
+</body>
+</html>
