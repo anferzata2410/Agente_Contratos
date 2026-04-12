@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function iniciarFormularioVacio() {
-  // Todos los contenedores vacios, solo con boton de agregar
+  // Reset completo del formulario
+  document.getElementById("checklist-form").reset();
+
+  // Limpiar contenedores dinamicos
   document.getElementById("deudores-container").innerHTML = "";
   contadorDeudores = 0;
 
@@ -18,6 +21,16 @@ function iniciarFormularioVacio() {
 
   document.getElementById("codeudores-container").innerHTML = "";
   contadorCodeudores = 0;
+
+  // Limpiar campos fijos (readonly y demas)
+  const camposFijos = ["tipo_contrato", "prestamo_monto", "prestamo_comision",
+    "prestamo_plazo", "prestamo_tasa", "prestamo_cuota", "prestamo_forma_pago",
+    "prestamo_observaciones", "inmueble_matricula", "inmueble_cedula_catastral",
+    "inmueble_chip", "inmueble_direccion", "inmueble_descripcion", "inmueble_linderos"];
+  camposFijos.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
 }
 
 // ══════════════════════════════════════════════
