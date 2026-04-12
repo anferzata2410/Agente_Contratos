@@ -366,13 +366,11 @@ def escribir_firma(celda, personas):
         return p_el
 
     titulo, lista_firmas = personas
-    # Título (negrita) + espacio doble despues
+    # Título (negrita)
     agregar_parrafo(titulo, negrita=True)
-    agregar_parrafo("")
-    agregar_parrafo("")
 
     for nombre, cc in lista_firmas:
-        # Líneas vacías de separación antes de la firma
+        # Líneas vacías de separación (igual que la plantilla)
         agregar_parrafo("")
         agregar_parrafo("")
         # Línea de firma, nombre y CC juntos sin espacio vertical
