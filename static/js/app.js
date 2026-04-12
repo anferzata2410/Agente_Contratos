@@ -462,30 +462,38 @@ function crearCardPersona(tipo, idx, conEliminar) {
 // ══════════════════════════════════════════════
 
 function sincronizarMontoDeudor() {
-  // La participacion del deudor principal (deudor 1) es el monto total del prestamo
-  const monto = val("deudor_1_participacion_monto");
-  const elMonto = document.getElementById("prestamo_monto");
-  if (elMonto) elMonto.value = monto;
+  // Monto total = suma de la participacion $ de TODOS los deudores
+  let montoTotal = 0;
+  for (let i = 1; i <= contadorDeudores; i++) {
+    montoTotal += parseInt((val(`deudor_${i}_participacion_monto`) || "0").replace(/\./g, ""), 10) || 0;
+  }
 
-  // Monto total numerico
-  const montoTotal = parseInt((monto || "0").replace(/\./g, ""), 10) || 0;
+  // Sincronizar monto del prestamo
+  const elMonto = document.getElementById("prestamo_monto");
+  if (elMonto) {
+    elMonto.value = montoTotal > 0 ? montoTotal.toLocaleString("es-CO").replace(/,/g, ".") : "";
+  }
 
   // Calcular % de participacion de cada deudor
   for (let i = 1; i <= contadorDeudores; i++) {
     const montoDeudor = parseInt((val(`deudor_${i}_participacion_monto`) || "0").replace(/\./g, ""), 10) || 0;
     const elPct = document.getElementById(`deudor_${i}_participacion_porcentaje`);
-    if (elPct && montoTotal > 0 && montoDeudor > 0) {
-      elPct.value = ((montoDeudor / montoTotal) * 100).toFixed(1) + "%";
+    if (elPct) {
+      if (contadorDeudores === 1 && montoDeudor > 0) {
+        elPct.value = "100%";
+      } else if (montoTotal > 0 && montoDeudor > 0) {
+        elPct.value = ((montoDeudor / montoTotal) * 100).toFixed(1) + "%";
+      } else {
+        elPct.value = "";
+      }
     }
   }
 
   // Comision Aluri = 5% del monto total
   const comision = Math.round(montoTotal * 5 / 100);
   const elComision = document.getElementById("prestamo_comision");
-  if (elComision && comision > 0) {
-    elComision.value = comision.toLocaleString("es-CO").replace(/,/g, ".");
-  } else if (elComision) {
-    elComision.value = "";
+  if (elComision) {
+    elComision.value = comision > 0 ? comision.toLocaleString("es-CO").replace(/,/g, ".") : "";
   }
 }
 
