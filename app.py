@@ -850,6 +850,14 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         if patron_titulo.match(texto):
             aplicar_keep(p, keep_next=True, keep_lines=True)
 
+    # REGLA FIJA: "TRIGESIMA. FIRMA ELECTRONICA" + "Para constancia" + firmas juntos
+    for i, p in enumerate(doc.paragraphs):
+        if "FIRMA ELECTR" in p.text.upper() and "TRIG" in p.text.upper():
+            # Aplicar keepNext desde TRIGESIMA hasta la tabla de firmas
+            for j in range(i, min(i + 10, len(doc.paragraphs))):
+                aplicar_keep(doc.paragraphs[j], keep_next=True, keep_lines=False)
+            break
+
     # REGLA FIJA: "Anexo No. 2" nunca se separa de "PAGARÉ No. 1"
     # Eliminar parrafos vacios entre ellos y antes de Anexo No. 2
     for i, p in enumerate(doc.paragraphs):
