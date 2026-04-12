@@ -1295,19 +1295,34 @@ def generar_formulario_pdf(datos: dict, ruta_salida: Path):
         fontName=font_name, fontSize=8, leading=10, textColor=COLOR_TEXT_LIGHT)
     elements = []
 
-    # Titulo
+    # Titulo con linea turquesa
     elements.append(Paragraph("<b>FORMULARIO DE SOLICITUD</b>", titulo_style))
     elements.append(Paragraph("Check List - Informacion Requerida", small_style))
+    elements.append(Spacer(1, 4))
+    # Linea turquesa decorativa
+    linea = Table([[""]],  colWidths=[17*cm])
+    linea.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#3be3cf")),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("LINEABOVE", (0, 0), (-1, -1), 3, colors.HexColor("#3be3cf")),
+    ]))
+    elements.append(linea)
     elements.append(Spacer(1, 12))
 
+    COLOR_ACCENT = colors.HexColor("#3be3cf")
+
     def seccion(titulo):
-        t = Table([[Paragraph(titulo, subtitulo_style)]], colWidths=[17*cm])
+        # Barra turquesa + fondo oscuro (estilo Aluri)
+        t = Table([["", Paragraph(titulo, subtitulo_style)]], colWidths=[0.4*cm, 16.6*cm])
         t.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), COLOR_PRIMARY),
+            ("BACKGROUND", (0, 0), (0, -1), COLOR_ACCENT),
+            ("BACKGROUND", (1, 0), (-1, -1), COLOR_PRIMARY),
             ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
-            ("ROUNDEDCORNERS", [4, 4, 0, 0]),
+            ("LEFTPADDING", (0, 0), (0, -1), 0),
+            ("RIGHTPADDING", (0, 0), (0, -1), 0),
         ]))
         elements.append(t)
         elements.append(Spacer(1, 4))
