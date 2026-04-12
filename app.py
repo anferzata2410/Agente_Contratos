@@ -1287,6 +1287,8 @@ def generar_formulario_pdf(datos: dict, ruta_salida: Path):
     styles = getSampleStyleSheet()
     titulo_style = ParagraphStyle("Titulo", parent=styles["Heading1"],
         fontName=font_name, fontSize=16, alignment=1, spaceAfter=4, textColor=COLOR_PRIMARY)
+    subtitulo_style = ParagraphStyle("Subtitulo", parent=styles["Heading2"],
+        fontName=font_name, fontSize=11, textColor=colors.white, spaceAfter=2)
     normal_style = ParagraphStyle("Normal2", parent=styles["Normal"],
         fontName=font_name, fontSize=9, leading=12, textColor=COLOR_TEXT)
     small_style = ParagraphStyle("Small", parent=styles["Normal"],
@@ -1310,16 +1312,13 @@ def generar_formulario_pdf(datos: dict, ruta_salida: Path):
 
     COLOR_ACCENT = colors.HexColor("#3be3cf")
 
-    subtitulo_dark = ParagraphStyle("SubtituloDark", parent=styles["Heading2"],
-        fontName=font_name, fontSize=11, textColor=COLOR_PRIMARY, spaceAfter=2)
-
     def seccion(titulo):
-        # Fondo turquesa + barra oscura lateral, texto negro
-        t = Table([["", Paragraph(titulo, subtitulo_dark)]], colWidths=[0.4*cm, 16.6*cm])
+        # Barra turquesa + fondo oscuro (estilo Aluri)
+        t = Table([["", Paragraph(titulo, subtitulo_style)]], colWidths=[0.4*cm, 16.6*cm])
         t.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (0, -1), COLOR_PRIMARY),
-            ("BACKGROUND", (1, 0), (-1, -1), COLOR_ACCENT),
-            ("TEXTCOLOR", (0, 0), (-1, -1), COLOR_PRIMARY),
+            ("BACKGROUND", (0, 0), (0, -1), COLOR_ACCENT),
+            ("BACKGROUND", (1, 0), (-1, -1), COLOR_PRIMARY),
+            ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
             ("TOPPADDING", (0, 0), (-1, -1), 8),
             ("LEFTPADDING", (0, 0), (0, -1), 0),
