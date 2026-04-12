@@ -875,14 +875,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                     break
             break
 
-    # ── Saltos de pagina fijos para secciones principales ──
-
-    # Salto antes de la lista de anexos ("Anexo No. 1: Escritura...")
-    for p in doc.paragraphs:
-        if "Anexo No. 1" in p.text and "Escritura" in p.text:
-            aplicar_page_break(p)
-            break
-
     doc.save(str(ruta_output))
     return ruta_output
 
