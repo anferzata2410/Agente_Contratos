@@ -1269,45 +1269,26 @@ def generar_formulario_pdf(datos: dict, ruta_salida: Path):
         leftMargin=2*cm, rightMargin=2*cm, topMargin=2*cm, bottomMargin=2*cm,
     )
 
-    # Colores Aluri
-    COLOR_PRIMARY = colors.HexColor("#0F172A")
-    COLOR_BG = colors.HexColor("#F8FAFC")
-    COLOR_TEXT = colors.HexColor("#0f172a")
-    COLOR_TEXT_LIGHT = colors.HexColor("#64748b")
-    COLOR_BORDER = colors.HexColor("#e2e8f0")
-
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    try:
-        pdfmetrics.registerFont(TTFont('Inter', 'static/fonts/Inter.ttf'))
-        font_name = 'Inter'
-    except Exception:
-        font_name = 'Helvetica'
-
     styles = getSampleStyleSheet()
-    titulo_style = ParagraphStyle("Titulo", parent=styles["Heading1"],
-        fontName=font_name, fontSize=16, alignment=1, spaceAfter=4, textColor=COLOR_PRIMARY)
-    subtitulo_style = ParagraphStyle("Subtitulo", parent=styles["Heading2"],
-        fontName=font_name, fontSize=11, textColor=colors.white, spaceAfter=2)
-    normal_style = ParagraphStyle("Normal2", parent=styles["Normal"],
-        fontName=font_name, fontSize=9, leading=12, textColor=COLOR_TEXT)
-    small_style = ParagraphStyle("Small", parent=styles["Normal"],
-        fontName=font_name, fontSize=8, leading=10, textColor=COLOR_TEXT_LIGHT)
+    titulo_style = ParagraphStyle("Titulo", parent=styles["Heading1"], fontSize=14, alignment=1, spaceAfter=6)
+    subtitulo_style = ParagraphStyle("Subtitulo", parent=styles["Heading2"], fontSize=11, textColor=colors.white, spaceAfter=2)
+    normal_style = ParagraphStyle("Normal2", parent=styles["Normal"], fontSize=9, leading=11)
+    small_style = ParagraphStyle("Small", parent=styles["Normal"], fontSize=8, leading=10, textColor=colors.grey)
+
     elements = []
 
     # Titulo
-    elements.append(Paragraph("<b>FORMULARIO DE SOLICITUD</b>", titulo_style))
+    elements.append(Paragraph("FORMULARIO DE SOLICITUD", titulo_style))
     elements.append(Paragraph("Check List - Informacion Requerida", small_style))
-    elements.append(Spacer(1, 12))
+    elements.append(Spacer(1, 10))
 
     def seccion(titulo):
         t = Table([[Paragraph(titulo, subtitulo_style)]], colWidths=[17*cm])
         t.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), COLOR_PRIMARY),
+            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#1a3a5c")),
             ("TEXTCOLOR", (0, 0), (-1, -1), colors.white),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-            ("TOPPADDING", (0, 0), (-1, -1), 8),
-            ("ROUNDEDCORNERS", [4, 4, 0, 0]),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
         ]))
         elements.append(t)
         elements.append(Spacer(1, 4))
@@ -1322,16 +1303,16 @@ def generar_formulario_pdf(datos: dict, ruta_salida: Path):
             ])
         t = Table(data, colWidths=[6*cm, 11*cm])
         t.setStyle(TableStyle([
-            ("GRID", (0, 0), (-1, -1), 0.5, COLOR_BORDER),
-            ("BACKGROUND", (0, 0), (0, -1), COLOR_BG),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.lightgrey),
+            ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f4f6f9")),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("LEFTPADDING", (0, 0), (-1, -1), 8),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-            ("TOPPADDING", (0, 0), (-1, -1), 5),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
         ]))
         elements.append(t)
-        elements.append(Spacer(1, 10))
+        elements.append(Spacer(1, 8))
 
     # ── Tipo de contrato ──
     seccion("TIPO DE CONTRATO")
