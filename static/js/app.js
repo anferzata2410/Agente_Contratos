@@ -345,23 +345,23 @@ function mostrarPrestamo() {
     <div class="form-grid">
       <div class="field">
         <label>Monto del prestamo <span class="required">*</span></label>
-        <input type="text" id="prestamo_monto" placeholder="180.000.000" readonly>
+        <input type="text" id="prestamo_monto" placeholder="180.000.000" readonly autocomplete="off">
       </div>
       <div class="field">
         <label>Plazo (meses) <span class="required">*</span></label>
-        <input type="number" id="prestamo_plazo" placeholder="60" min="1" max="360">
+        <input type="number" id="prestamo_plazo" placeholder="60" min="1" max="360" autocomplete="off">
       </div>
       <div class="field">
         <label>Tasa mensual anticipada <span class="required">*</span></label>
-        <input type="text" id="prestamo_tasa" placeholder="1.80%">
+        <input type="text" id="prestamo_tasa" placeholder="1.80%" autocomplete="off">
       </div>
       <div class="field">
         <label>Valor cuota mensual</label>
-        <input type="text" id="prestamo_cuota" placeholder="3.240.000" oninput="formatearMonto(this)">
+        <input type="text" id="prestamo_cuota" placeholder="3.240.000" oninput="formatearMonto(this)" autocomplete="off">
       </div>
       <div class="field">
         <label>Forma de pago <span class="required">*</span></label>
-        <select id="prestamo_forma_pago">
+        <select id="prestamo_forma_pago" autocomplete="off">
           <option value="">Seleccionar...</option>
           <option value="Solo intereses">Solo intereses</option>
           <option value="Interes y capital">Interes y capital</option>
@@ -369,14 +369,19 @@ function mostrarPrestamo() {
       </div>
       <div class="field">
         <label>Comision Aluri</label>
-        <input type="text" id="prestamo_comision" placeholder="9.000.000" readonly>
+        <input type="text" id="prestamo_comision" placeholder="9.000.000" readonly autocomplete="off">
       </div>
       <div class="field full-width">
         <label>Observaciones</label>
-        <textarea id="prestamo_observaciones" rows="3" placeholder="Condiciones especiales, notas adicionales..."></textarea>
+        <textarea id="prestamo_observaciones" rows="3" placeholder="Condiciones especiales, notas adicionales..." autocomplete="off"></textarea>
       </div>
     </div>
   `;
+  // Limpiar campos readonly que sincronizarMontoDeudor pudo haber llenado
+  const elMonto = document.getElementById("prestamo_monto");
+  if (elMonto) elMonto.value = "";
+  const elComision = document.getElementById("prestamo_comision");
+  if (elComision) elComision.value = "";
 }
 
 function eliminarPersona(tipo, idx) {
