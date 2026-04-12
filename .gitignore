@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+Contratos_Generados/
+data/
+*.tmp
+~$*

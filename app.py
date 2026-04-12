@@ -475,24 +475,44 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     filas_codeudores = len(codeudores) * 7
     offset = filas_deudores_extra + filas_codeudores
 
-    # Filas de acreedores (originalmente 15-27, ahora desplazadas por offset)
+    # ── Acreedores en tabla 0: escribir acr1 y acr2 en filas existentes,
+    #    insertar filas para acr3+ dinámicamente ──
     fila_acr1 = 16 + offset
     fila_acr2 = 22 + offset
 
-    if acr1:
-        escribir_celda(t0, fila_acr1, 1, acr1["nombre_completo"], negrita=True)
-        escribir_celda(t0, fila_acr1 + 1, 1, f"C.C. No. {acr1['cc']}")
-        escribir_celda(t0, fila_acr1 + 2, 1, acr1.get("estado_civil", ""))
-        escribir_celda(t0, fila_acr1 + 3, 1, acr1.get("direccion", ""))
-        escribir_celda(t0, fila_acr1 + 4, 1, acr1.get("email", ""))
-        escribir_celda(t0, fila_acr1 + 5, 1, acr1.get("telefono", ""))
-    if acr2:
-        escribir_celda(t0, fila_acr2, 1, acr2["nombre_completo"], negrita=True)
-        escribir_celda(t0, fila_acr2 + 1, 1, f"C.C. No. {acr2['cc']}")
-        escribir_celda(t0, fila_acr2 + 2, 1, acr2.get("estado_civil", ""))
-        escribir_celda(t0, fila_acr2 + 3, 1, acr2.get("direccion", ""))
-        escribir_celda(t0, fila_acr2 + 4, 1, acr2.get("email", ""))
-        escribir_celda(t0, fila_acr2 + 5, 1, acr2.get("telefono", ""))
+    for ia, acr in enumerate(acreedores):
+        if ia == 0:
+            # Acreedor 1: filas existentes en el template
+            escribir_celda(t0, fila_acr1, 1, acr["nombre_completo"], negrita=True)
+            escribir_celda(t0, fila_acr1 + 1, 1, f"C.C. No. {acr['cc']}")
+            escribir_celda(t0, fila_acr1 + 2, 1, acr.get("estado_civil", ""))
+            escribir_celda(t0, fila_acr1 + 3, 1, acr.get("direccion", ""))
+            escribir_celda(t0, fila_acr1 + 4, 1, acr.get("email", ""))
+            escribir_celda(t0, fila_acr1 + 5, 1, acr.get("telefono", ""))
+        elif ia == 1:
+            # Acreedor 2: filas existentes en el template
+            escribir_celda(t0, fila_acr2, 1, acr["nombre_completo"], negrita=True)
+            escribir_celda(t0, fila_acr2 + 1, 1, f"C.C. No. {acr['cc']}")
+            escribir_celda(t0, fila_acr2 + 2, 1, acr.get("estado_civil", ""))
+            escribir_celda(t0, fila_acr2 + 3, 1, acr.get("direccion", ""))
+            escribir_celda(t0, fila_acr2 + 4, 1, acr.get("email", ""))
+            escribir_celda(t0, fila_acr2 + 5, 1, acr.get("telefono", ""))
+        else:
+            # Acreedor 3+: insertar filas dinámicamente después del último
+            fila_ins = fila_acr2 + 5 + (ia - 2) * 7
+            insertar_fila_tabla(t0, fila_ins, f"INFORMACIÓN DE ACREEDOR {ia + 1}", f"INFORMACIÓN DE ACREEDOR {ia + 1}")
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Nombre", acr["nombre_completo"], negrita_col1=True)
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Documento de identidad", f"C.C. No. {acr['cc']}")
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Estado civil", acr.get("estado_civil", ""))
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Dirección de notificación", acr.get("direccion", ""))
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Correo electrónico", acr.get("email", ""))
+            fila_ins += 1
+            insertar_fila_tabla(t0, fila_ins, "Número de celular", acr.get("telefono", ""))
 
     # ──────────────────────────────────────────
     # TABLA 1: DESCRIPCION DEL CREDITO (7 filas x 3 cols)
@@ -504,15 +524,17 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     escribir_celda(t1, 6, 2, prest["cuota_mensual_total_texto"])
 
     # ──────────────────────────────────────────
-    # TABLA 2: CUENTAS BANCARIAS (3 filas x 2 cols)
+    # TABLA 2: CUENTAS BANCARIAS (dinamica segun acreedores)
     # ──────────────────────────────────────────
     t2 = doc.tables[2]
-    if acr1:
-        escribir_celda(t2, 1, 0, acr1["nombre_completo"])
-        escribir_celda(t2, 1, 1, acr1.get("cuenta_bancaria", ""))
-    if acr2:
-        escribir_celda(t2, 2, 0, acr2["nombre_completo"])
-        escribir_celda(t2, 2, 1, acr2.get("cuenta_bancaria", ""))
+    for ia, acr in enumerate(acreedores):
+        if ia < 2:
+            # Filas existentes (1 y 2)
+            escribir_celda(t2, ia + 1, 0, acr["nombre_completo"])
+            escribir_celda(t2, ia + 1, 1, acr.get("cuenta_bancaria", ""))
+        else:
+            # Acreedor 3+: insertar fila nueva
+            insertar_fila_tabla(t2, ia, acr["nombre_completo"], acr.get("cuenta_bancaria", ""))
 
     # ──────────────────────────────────────────
     # TABLA 3: FIRMAS CONTRATO (1 fila x 2 cols)
