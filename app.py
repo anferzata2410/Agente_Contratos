@@ -596,6 +596,17 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                             r_el.append(t_el)
                             p_el.append(r_el)
             tbl_el.append(nueva_tr)
+
+        # REGLA FIJA: tabla de participacion nunca se divide entre paginas
+        # Aplicar cantSplit a cada fila para que Word las mantenga juntas
+        for tr in tbl_el.findall(f'{ns_w}tr'):
+            trPr = tr.find(f'{ns_w}trPr')
+            if trPr is None:
+                trPr = tr.makeelement(f'{ns_w}trPr', {})
+                tr.insert(0, trPr)
+            if trPr.find(f'{ns_w}cantSplit') is None:
+                trPr.append(trPr.makeelement(f'{ns_w}cantSplit', {}))
+
         break
 
     # ──────────────────────────────────────────
