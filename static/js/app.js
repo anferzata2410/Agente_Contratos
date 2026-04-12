@@ -4,6 +4,12 @@ let contadorAcreedores = 0;
 let contadorCodeudores = 0;
 
 // ── Inicializacion: formulario listo para llenado manual ──
+// Forzar scroll al inicio al recargar
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
 document.addEventListener("DOMContentLoaded", () => {
   iniciarFormularioVacio();
   window.scrollTo(0, 0);
