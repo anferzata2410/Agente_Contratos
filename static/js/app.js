@@ -6,6 +6,7 @@ let contadorCodeudores = 0;
 // ── Inicializacion: formulario listo para llenado manual ──
 document.addEventListener("DOMContentLoaded", () => {
   iniciarFormularioVacio();
+  window.scrollTo(0, 0);
 });
 
 function iniciarFormularioVacio() {
