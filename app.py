@@ -514,6 +514,7 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
 
     # ──────────────────────────────────────────
     # TABLA 3: FIRMAS CONTRATO (1 fila x 2 cols)
+    # Insertar espacio antes de la tabla de firmas
     # ──────────────────────────────────────────
     t3 = doc.tables[3]
     # Celda izquierda: Todos los deudores + Codeudores
@@ -887,6 +888,14 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                             break
                     break
             break
+
+    # Insertar espacio antes de la tabla de firmas del contrato (tabla 3)
+    # Se hace al final, despues de toda la limpieza de vacios
+    from docx.oxml import OxmlElement
+    t3_element = doc.tables[3]._tbl
+    for _ in range(3):
+        p_vacio = OxmlElement('w:p')
+        t3_element.addprevious(p_vacio)
 
     doc.save(str(ruta_output))
     return ruta_output
