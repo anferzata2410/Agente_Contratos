@@ -6,12 +6,19 @@ Genera el documento "Contrato Mutuo Solo Interes" como .docx descargable.
 import re
 import json
 import shutil
+import traceback
+from copy import deepcopy
 from pathlib import Path
 from datetime import datetime, date
 
+from lxml import etree
 from flask import Flask, render_template, request, jsonify, send_file
 from docx import Document
+from docx.table import Table as DocxTable
 from num2words import num2words
+
+# Namespace XML de Word (usado en todo el documento)
+NS_W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
 CHECKLIST_PATH = Path(__file__).parent / "Documentacion" / "Check_List.docx"
 
@@ -267,17 +274,14 @@ def insertar_fila_tabla(tabla, despues_de_fila, col0_texto, col1_texto, negrita_
     Inserta una fila nueva en una tabla DESPUES de la fila indicada.
     Copia el formato de la fila de referencia.
     """
-    from copy import deepcopy
-
     fila_ref = tabla.rows[despues_de_fila]
     nueva_tr = deepcopy(fila_ref._tr)
 
     # Limpiar contenido de la nueva fila
-    ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-    for tc in nueva_tr.findall(f'.//{ns_w}tc'):
-        for p in tc.findall(f'{ns_w}p'):
-            for r in p.findall(f'{ns_w}r'):
-                for t in r.findall(f'{ns_w}t'):
+    for tc in nueva_tr.findall(f'.//{NS_W}tc'):
+        for p in tc.findall(f'{NS_W}p'):
+            for r in p.findall(f'{NS_W}r'):
+                for t in r.findall(f'{NS_W}t'):
                     t.text = ""
 
     # Insertar despues de la fila de referencia
@@ -307,13 +311,12 @@ def insertar_fila_tabla(tabla, despues_de_fila, col0_texto, col1_texto, negrita_
 def escribir_celda(tabla, fila, col, texto, negrita=False):
     """Escribe texto en una celda, limpiando TODO el contenido previo (runs, hyperlinks, etc.)."""
     celda = tabla.rows[fila].cells[col]
-    ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     # Limpiar todos los párrafos: runs, hyperlinks y cualquier otro contenido
     for p in celda.paragraphs:
         for run in p.runs:
             run.text = ""
         # Eliminar hyperlinks (que no son runs normales)
-        for hyper in p._element.findall(f'{ns_w}hyperlink'):
+        for hyper in p._element.findall(f'{NS_W}hyperlink'):
             p._element.remove(hyper)
     # Escribir en el primer párrafo
     para = celda.paragraphs[0]
@@ -333,31 +336,29 @@ def escribir_firma(celda, personas):
     personas = [("TITULO", [("NOMBRE1", "CC1"), ("NOMBRE2", "CC2"), ...])]
     Preserva negrita, espaciado y formato original.
     """
-    ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     tc = celda._tc
 
     # Eliminar todos los párrafos existentes
-    for p_el in tc.findall(f'{ns_w}p'):
+    for p_el in tc.findall(f'{NS_W}p'):
         tc.remove(p_el)
 
     def agregar_parrafo(texto, negrita=False, sin_espacio=False):
         """Agrega un párrafo con un run al final de la celda."""
-        from lxml import etree
-        p_el = etree.SubElement(tc, f'{ns_w}p')
+        p_el = etree.SubElement(tc, f'{NS_W}p')
         # Eliminar espacio entre parrafos para que queden juntos
         if sin_espacio:
-            ppr = etree.SubElement(p_el, f'{ns_w}pPr')
-            spacing = etree.SubElement(ppr, f'{ns_w}spacing')
-            spacing.set(f'{ns_w}after', '0')
-            spacing.set(f'{ns_w}before', '0')
-            spacing.set(f'{ns_w}line', '240')
-            spacing.set(f'{ns_w}lineRule', 'auto')
+            ppr = etree.SubElement(p_el, f'{NS_W}pPr')
+            spacing = etree.SubElement(ppr, f'{NS_W}spacing')
+            spacing.set(f'{NS_W}after', '0')
+            spacing.set(f'{NS_W}before', '0')
+            spacing.set(f'{NS_W}line', '240')
+            spacing.set(f'{NS_W}lineRule', 'auto')
         if texto:
-            r_el = etree.SubElement(p_el, f'{ns_w}r')
-            rpr = etree.SubElement(r_el, f'{ns_w}rPr')
+            r_el = etree.SubElement(p_el, f'{NS_W}r')
+            rpr = etree.SubElement(r_el, f'{NS_W}rPr')
             if negrita:
-                etree.SubElement(rpr, f'{ns_w}b')
-            t_el = etree.SubElement(r_el, f'{ns_w}t')
+                etree.SubElement(rpr, f'{NS_W}b')
+            t_el = etree.SubElement(r_el, f'{NS_W}t')
             t_el.text = texto
             t_el.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
         return p_el
@@ -550,15 +551,13 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     # (tabla nested dentro del cuerpo, entre PARAGRAFO TERCERO y CUARTO)
     # Encabezado: NOMBRE DEL ACREEDORES | % PARTICIPACIÓN | APORTE EN $COP
     # ──────────────────────────────────────────
-    from docx.table import Table as DocxTable
-    ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-    all_tbls = doc.element.body.findall(f'.//{ns_w}tbl')
+    all_tbls = doc.element.body.findall(f'.//{NS_W}tbl')
     for tbl_el in all_tbls:
         # Buscar la tabla que tiene "NOMBRE DEL ACREEDOR" en la primera fila
-        first_row = tbl_el.findall(f'{ns_w}tr')
+        first_row = tbl_el.findall(f'{NS_W}tr')
         if not first_row:
             continue
-        first_text = ''.join((t.text or '') for t in first_row[0].findall(f'.//{ns_w}t'))
+        first_text = ''.join((t.text or '') for t in first_row[0].findall(f'.//{NS_W}t'))
         if 'NOMBRE DEL ACREEDOR' not in first_text.upper():
             continue
 
@@ -575,23 +574,22 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
             monto_aporte = formato_pesos(a.get("participacion_monto", 0))
 
             # Copiar estructura de la primera fila de datos (row 1 del template)
-            from copy import deepcopy
             nueva_tr = deepcopy(first_row[1]) if len(first_row) > 1 else deepcopy(first_row[0])
-            tcs = nueva_tr.findall(f'{ns_w}tc')
+            tcs = nueva_tr.findall(f'{NS_W}tc')
             valores = [a["nombre_completo"], pct, monto_aporte]
             for ci, tc in enumerate(tcs):
                 if ci < len(valores):
-                    for t in tc.findall(f'.//{ns_w}t'):
+                    for t in tc.findall(f'.//{NS_W}t'):
                         t.text = ""
-                    ts = tc.findall(f'.//{ns_w}t')
+                    ts = tc.findall(f'.//{NS_W}t')
                     if ts:
                         ts[0].text = valores[ci]
                     else:
                         # Crear un run con texto
-                        p_el = tc.find(f'{ns_w}p')
+                        p_el = tc.find(f'{NS_W}p')
                         if p_el is not None:
-                            r_el = p_el.makeelement(f'{ns_w}r', {})
-                            t_el = r_el.makeelement(f'{ns_w}t', {})
+                            r_el = p_el.makeelement(f'{NS_W}r', {})
+                            t_el = r_el.makeelement(f'{NS_W}t', {})
                             t_el.text = valores[ci]
                             r_el.append(t_el)
                             p_el.append(r_el)
@@ -599,13 +597,13 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
 
         # REGLA FIJA: tabla de participacion nunca se divide entre paginas
         # Aplicar cantSplit a cada fila para que Word las mantenga juntas
-        for tr in tbl_el.findall(f'{ns_w}tr'):
-            trPr = tr.find(f'{ns_w}trPr')
+        for tr in tbl_el.findall(f'{NS_W}tr'):
+            trPr = tr.find(f'{NS_W}trPr')
             if trPr is None:
-                trPr = tr.makeelement(f'{ns_w}trPr', {})
+                trPr = tr.makeelement(f'{NS_W}trPr', {})
                 tr.insert(0, trPr)
-            if trPr.find(f'{ns_w}cantSplit') is None:
-                trPr.append(trPr.makeelement(f'{ns_w}cantSplit', {}))
+            if trPr.find(f'{NS_W}cantSplit') is None:
+                trPr.append(trPr.makeelement(f'{NS_W}cantSplit', {}))
 
         break
 
@@ -731,8 +729,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     # consecutivos (>= 5) que generan paginas en blanco.
     # Se reemplazan por un salto de pagina limpio.
     # ──────────────────────────────────────────────────────────
-    from lxml import etree
-    ns_w2 = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     body = doc.element.body
 
     # Eliminar bloques de 5+ parrafos vacios consecutivos
@@ -763,9 +759,9 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     # Limpiar TODOS los pageBreakBefore que vienen del template
     # (algunos son incorrectos, ej: parrafos de dacion en pago)
     for p in doc.paragraphs:
-        pPr = p._element.find(f'{ns_w2}pPr')
+        pPr = p._element.find(f'{NS_W}pPr')
         if pPr is not None:
-            pb = pPr.find(f'{ns_w2}pageBreakBefore')
+            pb = pPr.find(f'{NS_W}pageBreakBefore')
             if pb is not None:
                 pPr.remove(pb)
 
@@ -786,11 +782,11 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         elif texto in ("Anexo No. 3", "Anexo No. 3 "):
             necesita_salto = True
         if necesita_salto:
-            pPr = p._element.find(f'{ns_w2}pPr')
+            pPr = p._element.find(f'{NS_W}pPr')
             if pPr is None:
-                pPr = etree.SubElement(p._element, f'{ns_w2}pPr')
+                pPr = etree.SubElement(p._element, f'{NS_W}pPr')
                 p._element.insert(0, pPr)
-            etree.SubElement(pPr, f'{ns_w2}pageBreakBefore')
+            etree.SubElement(pPr, f'{NS_W}pageBreakBefore')
 
     # ──────────────────────────────────────────────────────────
     # FORMATO DINAMICO: EVITAR TITULOS CORTADOS DE SU CONTENIDO
@@ -798,14 +794,9 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     # para que nunca queden separados del texto que les sigue,
     # sin importar la cantidad de personas en el contrato.
     # ──────────────────────────────────────────────────────────
-    import re as re_mod
-    from lxml import etree
-
-    ns_w2 = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-    body = doc.element.body
 
     # Patron que detecta titulos de clausulas, paragrafos y secciones
-    patron_titulo = re_mod.compile(
+    patron_titulo = re.compile(
         r"^("
         r"PRIMERA|SEGUNDA|TERCERA|CUARTA|QUINTA|SEXTA|"
         r"S[EÉ]PTIMA|OCTAVA|NOVENA|"
@@ -819,28 +810,28 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         r"INSTRUCCIONES$|"
         r"REFERENCIA:"
         r")",
-        re_mod.IGNORECASE
+        re.IGNORECASE
     )
 
     def aplicar_keep(parrafo, keep_next=True, keep_lines=True):
         """Aplica keepNext y keepLines a un parrafo."""
-        pPr = parrafo._element.find(f'{ns_w2}pPr')
+        pPr = parrafo._element.find(f'{NS_W}pPr')
         if pPr is None:
-            pPr = etree.SubElement(parrafo._element, f'{ns_w2}pPr')
+            pPr = etree.SubElement(parrafo._element, f'{NS_W}pPr')
             parrafo._element.insert(0, pPr)
-        if keep_next and pPr.find(f'{ns_w2}keepNext') is None:
-            etree.SubElement(pPr, f'{ns_w2}keepNext')
-        if keep_lines and pPr.find(f'{ns_w2}keepLines') is None:
-            etree.SubElement(pPr, f'{ns_w2}keepLines')
+        if keep_next and pPr.find(f'{NS_W}keepNext') is None:
+            etree.SubElement(pPr, f'{NS_W}keepNext')
+        if keep_lines and pPr.find(f'{NS_W}keepLines') is None:
+            etree.SubElement(pPr, f'{NS_W}keepLines')
 
     def aplicar_page_break(parrafo):
         """Aplica pageBreakBefore a un parrafo."""
-        pPr = parrafo._element.find(f'{ns_w2}pPr')
+        pPr = parrafo._element.find(f'{NS_W}pPr')
         if pPr is None:
-            pPr = etree.SubElement(parrafo._element, f'{ns_w2}pPr')
+            pPr = etree.SubElement(parrafo._element, f'{NS_W}pPr')
             parrafo._element.insert(0, pPr)
-        if pPr.find(f'{ns_w2}pageBreakBefore') is None:
-            etree.SubElement(pPr, f'{ns_w2}pageBreakBefore')
+        if pPr.find(f'{NS_W}pageBreakBefore') is None:
+            etree.SubElement(pPr, f'{NS_W}pageBreakBefore')
 
     # Aplicar keepNext a todos los titulos para que no se separen de su texto
     for p in doc.paragraphs:
@@ -931,7 +922,6 @@ def cargar_checklist():
         datos = parsear_checklist_docx(ruta)
         return jsonify({"ok": True, "datos": datos})
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return jsonify({"ok": False, "error": str(e)}), 500
     finally:
@@ -1297,7 +1287,6 @@ def api_generar_contrato():
         )
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return jsonify({"ok": False, "error": str(e)}), 500
 
@@ -1325,7 +1314,6 @@ def api_generar_contrato_pdf():
         )
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return jsonify({"ok": False, "error": str(e)}), 500
 
