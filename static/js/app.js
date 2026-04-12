@@ -135,7 +135,7 @@ function rellenarFormulario(datos) {
     acreedoresData.forEach((acr) => {
       contadorAcreedores++;
       const idx = contadorAcreedores;
-      container.insertAdjacentHTML("beforeend", crearCardPersona("acreedor", idx, false));
+      container.insertAdjacentHTML("beforeend", crearCardPersona("acreedor", idx, true));
       setVal(`acreedor_${idx}_nombre`, acr.nombre || "");
       setVal(`acreedor_${idx}_cc`, acr.cc || "");
       setVal(`acreedor_${idx}_cc_expedicion`, acr.cc_expedicion || "");
