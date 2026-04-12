@@ -819,7 +819,7 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     # Insertar espacio antes de TODAS las tablas de firmas (tablas 3-7, 9)
     # Se hace al final, despues de toda la limpieza de vacios
     from docx.oxml import OxmlElement
-    for ti in [3, 4, 5, 6, 7, 9]:
+    for ti in [3, 4, 5, 6, 7]:
         if ti < len(doc.tables):
             tbl_el = doc.tables[ti]._tbl
             for _ in range(3):
