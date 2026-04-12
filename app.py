@@ -5,7 +5,6 @@ Genera el documento "Contrato Mutuo Solo Interes" como .docx descargable.
 
 import re
 import json
-import shutil
 import traceback
 from copy import deepcopy
 from pathlib import Path
@@ -20,6 +19,8 @@ from num2words import num2words
 # Namespace XML de Word (usado en todo el documento)
 NS_W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
+from docxtpl import DocxTemplate
+
 CHECKLIST_PATH = Path(__file__).parent / "Documentacion" / "Check_List.docx"
 
 app = Flask(__name__)
@@ -27,7 +28,8 @@ app = Flask(__name__)
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
-TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato_PLANTILLA.docx"
+TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato_TPL_DOCXTPL.docx"
+TEMPLATE_PATH_LEGACY = BASE_DIR / "Documentacion" / "Contrato_PLANTILLA.docx"
 OUTPUT_DIR = BASE_DIR / "Contratos_Generados"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -381,8 +383,8 @@ def escribir_firma(celda, personas):
 
 def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: Path) -> Path:
     """
-    Copia el template del contrato, escribe directamente en las tablas
-    y reemplaza texto en cláusulas/pagarés con los datos del formulario.
+    Genera el contrato usando docxtpl (Jinja2 en Word) para variables simples,
+    y python-docx para las partes dinámicas (filas extra, firmas, formato).
     """
     todos_deudores = datos_enriquecidos["deudores"]
     deudor = todos_deudores[0] if todos_deudores else {}
@@ -401,36 +403,91 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     nombre_archivo = f"Contrato_{nombre_deudor}_{ts}.docx"
     ruta_output = OUTPUT_DIR / nombre_archivo
 
-    shutil.copy2(str(ruta_template), str(ruta_output))
+    # ═══════════════════════════════════════
+    # PASO 1: Render con docxtpl (variables Jinja2)
+    # ═══════════════════════════════════════
+    # Generar texto de participacion de acreedores
+    partes = []
+    for a in acreedores:
+        pct = a.get("participacion_porcentaje", "").replace("%", "").strip()
+        partes.append(f"{a['nombre_completo']} con una participación de "
+                      f"{formato_pesos(a.get('participacion_monto', 0))} equivalente al {pct}% del crédito")
+    texto_part = ", y ".join(partes) if partes else ""
+
+    mt = prest["monto_total"]
+    mi = prest["monto_inicial_credito"]
+
+    context = {
+        # Fecha
+        "fecha_firma": fecha,
+        "fecha_firma_lower": fecha.lower(),
+        # Deudor principal
+        "deudor_nombre": deudor.get("nombre_completo", ""),
+        "deudor_cc": deudor.get("cc", ""),
+        "deudor_municipio": deudor.get("municipio", ""),
+        "deudor_estado_civil": deudor.get("estado_civil", ""),
+        "deudor_direccion": deudor.get("direccion", ""),
+        "deudor_email": deudor.get("email", ""),
+        "deudor_telefono": deudor.get("telefono", ""),
+        # Acreedor 1
+        "acr1_nombre": acr1.get("nombre_completo", ""),
+        "acr1_cc": acr1.get("cc", ""),
+        "acr1_estado_civil": acr1.get("estado_civil", ""),
+        "acr1_direccion": acr1.get("direccion", ""),
+        "acr1_email": acr1.get("email", ""),
+        "acr1_telefono": acr1.get("telefono", ""),
+        "acr1_cuenta": acr1.get("cuenta_bancaria", ""),
+        "acr1_pct": f"{acr1.get('participacion_porcentaje', '')}%".replace("%%", "%"),
+        "acr1_aporte": formato_pesos(acr1.get("participacion_monto", 0)),
+        # Acreedor 2
+        "acr2_nombre": acr2.get("nombre_completo", "") if acr2 else "",
+        "acr2_cc": acr2.get("cc", "") if acr2 else "",
+        "acr2_estado_civil": acr2.get("estado_civil", "") if acr2 else "",
+        "acr2_direccion": acr2.get("direccion", "") if acr2 else "",
+        "acr2_email": acr2.get("email", "") if acr2 else "",
+        "acr2_telefono": acr2.get("telefono", "") if acr2 else "",
+        "acr2_cuenta": acr2.get("cuenta_bancaria", "") if acr2 else "",
+        "acr2_pct": f"{acr2.get('participacion_porcentaje', '')}%".replace("%%", "%") if acr2 else "",
+        "acr2_aporte": formato_pesos(acr2.get("participacion_monto", 0)) if acr2 else "",
+        # Montos
+        "monto_total_texto": prest["monto_total_texto"],
+        "monto_total_mcte": f"{numero_a_texto(mt).upper()} DE PESOS M/CTE (COP{formato_pesos(mt)})",
+        "monto_total_pesos": formato_pesos(mt),
+        "monto_inicial_texto": monto_a_texto_legal(mi),
+        "monto_inicial_pesos": formato_pesos(mi),
+        "monto_restante_texto": monto_a_texto_legal(prest["monto_restante"]),
+        "cuota_mensual_texto": prest["cuota_mensual_total_texto"],
+        "cuota_mensual_pesos": formato_pesos(prest["cuota_mensual_total"]),
+        "cuota_anticipada_texto": monto_a_texto_legal(prest["cuota_mensual_total"]),
+        "comision_aluri_pesos": formato_pesos(prest["comision_aluri_total"]),
+        "comision_aluri_mcte": f"{numero_a_texto(prest['comision_aluri_total']).upper()} DE PESOS M/CTE (COP{formato_pesos(prest['comision_aluri_total'])})",
+        # Prestamo
+        "tasa_texto": f"{prest['tasa_mensual']} mensual anticipado",
+        "plazo_texto": prest["plazo_texto"],
+        "plazo_meses": str(prest.get("plazo_meses", "")),
+        # Inmueble
+        "matricula_inmobiliaria": inm.get("matricula_inmobiliaria", ""),
+        "direccion_inmueble": inm.get("direccion_corta", ""),
+        "chip": inm.get("chip", ""),
+        # Participacion
+        "texto_participacion_acreedores": texto_part,
+    }
+
+    tpl = DocxTemplate(str(ruta_template))
+    tpl.render(context)
+    tpl.save(str(ruta_output))
+
+    # ═══════════════════════════════════════
+    # PASO 2: Post-procesado con python-docx
+    # (partes dinámicas que docxtpl no maneja)
+    # ═══════════════════════════════════════
     doc = Document(str(ruta_output))
 
     # ──────────────────────────────────────────
-    # TABLA 0: DATOS BASICOS (28 filas x 2 cols)
+    # TABLA 0: Insertar filas dinámicas (deudores extra, codeudores, acreedores 3+)
+    # (Las celdas fijas ya fueron escritas por docxtpl)
     # ──────────────────────────────────────────
     t0 = doc.tables[0]
-
-    # Fila 1: Fecha
-    escribir_celda(t0, 1, 1, fecha)
-    # Fila 3: Monto TOTAL del credito
-    escribir_celda(t0, 3, 1, prest["monto_total_texto"])
-    # Fila 4: Tasa
-    escribir_celda(t0, 4, 1, f"{prest['tasa_mensual']} mensual anticipado")
-    # Fila 5: Plazo
-    escribir_celda(t0, 5, 1, f"{prest['plazo_texto']} contados a partir de la Fecha de Desembolso del Monto Inicial")
-    # Fila 6: Matricula
-    if inm.get("matricula_inmobiliaria"):
-        escribir_celda(t0, 6, 1, inm["matricula_inmobiliaria"])
-    # Fila 7: Direccion inmueble
-    if inm.get("direccion_corta"):
-        escribir_celda(t0, 7, 1, inm["direccion_corta"])
-
-    # Fila 9-14: Deudor principal
-    escribir_celda(t0, 9, 1, deudor["nombre_completo"], negrita=True)
-    escribir_celda(t0, 10, 1, f"C.C. No. {deudor['cc']}")
-    escribir_celda(t0, 11, 1, deudor["estado_civil"])
-    escribir_celda(t0, 12, 1, deudor["direccion"])
-    escribir_celda(t0, 13, 1, deudor["email"])
-    escribir_celda(t0, 14, 1, deudor["telefono"])
 
     # ── Deudores adicionales: insertar filas después del principal (fila 14) ──
     fila_insercion = 14
@@ -477,26 +534,12 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
 
     # ── Acreedores en tabla 0: escribir acr1 y acr2 en filas existentes,
     #    insertar filas para acr3+ dinámicamente ──
-    fila_acr1 = 16 + offset
     fila_acr2 = 22 + offset
 
+    # Acreedor 3+: insertar filas dinámicamente
     for ia, acr in enumerate(acreedores):
-        if ia == 0:
-            # Acreedor 1: filas existentes en el template
-            escribir_celda(t0, fila_acr1, 1, acr["nombre_completo"], negrita=True)
-            escribir_celda(t0, fila_acr1 + 1, 1, f"C.C. No. {acr['cc']}")
-            escribir_celda(t0, fila_acr1 + 2, 1, acr.get("estado_civil", ""))
-            escribir_celda(t0, fila_acr1 + 3, 1, acr.get("direccion", ""))
-            escribir_celda(t0, fila_acr1 + 4, 1, acr.get("email", ""))
-            escribir_celda(t0, fila_acr1 + 5, 1, acr.get("telefono", ""))
-        elif ia == 1:
-            # Acreedor 2: filas existentes en el template
-            escribir_celda(t0, fila_acr2, 1, acr["nombre_completo"], negrita=True)
-            escribir_celda(t0, fila_acr2 + 1, 1, f"C.C. No. {acr['cc']}")
-            escribir_celda(t0, fila_acr2 + 2, 1, acr.get("estado_civil", ""))
-            escribir_celda(t0, fila_acr2 + 3, 1, acr.get("direccion", ""))
-            escribir_celda(t0, fila_acr2 + 4, 1, acr.get("email", ""))
-            escribir_celda(t0, fila_acr2 + 5, 1, acr.get("telefono", ""))
+        if ia < 2:
+            continue  # acr1 y acr2 ya escritos por docxtpl
         else:
             # Acreedor 3+: insertar filas dinámicamente después del último
             fila_ins = fila_acr2 + 5 + (ia - 2) * 7
@@ -515,25 +558,12 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
             insertar_fila_tabla(t0, fila_ins, "Número de celular", acr.get("telefono", ""))
 
     # ──────────────────────────────────────────
-    # TABLA 1: DESCRIPCION DEL CREDITO (7 filas x 3 cols)
-    # ──────────────────────────────────────────
-    t1 = doc.tables[1]
-    escribir_celda(t1, 0, 2, prest["monto_total_texto"])
-    escribir_celda(t1, 2, 2, f"{prest['tasa_mensual']} mensual anticipado")
-    escribir_celda(t1, 5, 2, str(prest.get("plazo_meses", "")))
-    escribir_celda(t1, 6, 2, prest["cuota_mensual_total_texto"])
-
-    # ──────────────────────────────────────────
-    # TABLA 2: CUENTAS BANCARIAS (dinamica segun acreedores)
+    # TABLA 2: CUENTAS BANCARIAS - acreedor 3+ (insertar filas)
+    # (acr1 y acr2 ya escritos por docxtpl)
     # ──────────────────────────────────────────
     t2 = doc.tables[2]
     for ia, acr in enumerate(acreedores):
-        if ia < 2:
-            # Filas existentes (1 y 2)
-            escribir_celda(t2, ia + 1, 0, acr["nombre_completo"])
-            escribir_celda(t2, ia + 1, 1, acr.get("cuenta_bancaria", ""))
-        else:
-            # Acreedor 3+: insertar fila nueva
+        if ia >= 2:
             insertar_fila_tabla(t2, ia, acr["nombre_completo"], acr.get("cuenta_bancaria", ""))
 
     # ──────────────────────────────────────────
@@ -560,16 +590,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
             for cod in codeudores:
                 firmas_pag.append((f"{cod['nombre_completo']}\n(CODEUDOR)", cod["cc"]))
             escribir_firma(tabla.rows[0].cells[0], ("DEUDOR(ES)", firmas_pag))
-
-    # ──────────────────────────────────────────
-    # TABLA 8: ANEXO 3 - INSTRUCCIONES DE ENTREGA (9 filas x 2 cols)
-    # ──────────────────────────────────────────
-    t8 = doc.tables[8]
-    escribir_celda(t8, 1, 1, formato_pesos(prest["monto_total"]))
-    escribir_celda(t8, 2, 1, formato_pesos(prest["monto_inicial_credito"]))
-    escribir_celda(t8, 3, 1, formato_pesos(prest["comision_aluri_total"]))
-    # Fila 6: Cuota mensual primer mes (pago anticipado)
-    escribir_celda(t8, 6, 1, formato_pesos(prest["cuota_mensual_total"]))
 
     # ──────────────────────────────────────────
     # TABLA ANIDADA: PARTICIPACION DE ACREEDORES
@@ -631,123 +651,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                 trPr.append(trPr.makeelement(f'{NS_W}cantSplit', {}))
 
         break
-
-    # ──────────────────────────────────────────
-    # TEXTO DE CLAUSULAS Y PAGARES (buscar y reemplazar en parrafos)
-    # Usamos los nombres/datos del TEMPLATE para reemplazar
-    # ──────────────────────────────────────────
-    # Nombres template originales (para buscar en texto de clausulas)
-    TPL_DEUDOR_NOMBRES = [
-        "PATRICIA GONZÁLEZ VELÁSQUEZ",
-        "PATRICIA GONZALEZ VELASQUEZ",
-    ]
-    TPL_ACR1_NOMBRES = [
-        "HERNÁN JESÚS MONDOL CABARCAS",
-        "HERNAN JESUS MONDOL CABARCAS",
-    ]
-    TPL_ACR2_NOMBRES = [
-        "HAWER ALBERTO HERRERA RODRÍGUEZ",
-        "HAWER ALBERTO HERRERA RODRIGUEZ",
-    ]
-
-    reemplazos = []
-
-    # Deudor en texto
-    for tpl_name in TPL_DEUDOR_NOMBRES:
-        reemplazos.append((tpl_name, deudor["nombre_completo"]))
-    reemplazos.append(("C.C. No. 52.202.940", f"C.C. No. {deudor['cc']}"))
-    reemplazos.append(("52.202.940", deudor["cc"]))
-    reemplazos.append(("mayor de edad y vecina del municipio de Cota",
-                        f"mayor de edad y vecino/a del municipio de {deudor.get('municipio', '')}"))
-
-    # Acreedor 1 en texto (pagares, clausulas)
-    if acr1:
-        for tpl_name in TPL_ACR1_NOMBRES:
-            reemplazos.append((tpl_name, acr1["nombre_completo"]))
-        reemplazos.append(("C.C. No. 73.160.553", f"C.C. No. {acr1['cc']}"))
-        reemplazos.append(("73.160.553", acr1["cc"]))
-        reemplazos.append(("cédula de ciudadanía número 73.160.553",
-                            f"cédula de ciudadanía número {acr1['cc']}"))
-
-    # Acreedor 2 en texto (pagares, clausulas)
-    if acr2:
-        for tpl_name in TPL_ACR2_NOMBRES:
-            reemplazos.append((tpl_name, acr2["nombre_completo"]))
-        reemplazos.append(("C.C. No. 93.365.845", f"C.C. No. {acr2['cc']}"))
-        reemplazos.append(("93.365.845", acr2["cc"]))
-        reemplazos.append(("cédula de ciudadanía número 93.365.845",
-                            f"cédula de ciudadanía número {acr2['cc']}"))
-
-    # Montos en texto (el contrato maneja montos TOTALES del credito)
-    mt = prest["monto_total"]
-    mi = prest["monto_inicial_credito"]
-    mr = prest["monto_restante"]
-
-    # Monto total del credito (dos formatos en el template: "MONEDA CORRIENTE" y "M/CTE")
-    reemplazos.append(("NOVENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$90.000.000)",
-                        prest["monto_total_texto"]))
-    # Anexo 3 usa formato "M/CTE"
-    monto_texto_mcte = f"{numero_a_texto(mt).upper()} DE PESOS M/CTE (COP{formato_pesos(mt)})"
-    reemplazos.append(("NOVENTA MILLONES DE PESOS M/CTE (COP$90.000.000)", monto_texto_mcte))
-    reemplazos.append(("$90.000.000", formato_pesos(mt)))
-    # 35% Monto Inicial del Credito
-    reemplazos.append(("TREINTA Y UN MILLONES QUINIENTOS MIL PESOS MONEDA CORRIENTE (COP$31.500.000)",
-                        monto_a_texto_legal(mi)))
-    reemplazos.append(("$31.500.000", formato_pesos(mi)))
-    # 65% Monto Restante del Credito
-    reemplazos.append(("CINCUENTA Y OCHO MILLONES QUINIENTOS MIL PESOS MONEDA CORRIENTE (COP$58.500.000)",
-                        monto_a_texto_legal(mr)))
-    # Cuota mensual total
-    reemplazos.append(("Un millón seiscientos veinte mil pesos moneda corriente (COP$1.620.000)",
-                        prest["cuota_mensual_total_texto"]))
-    # Cuota anticipada primer mes (Anexo 3, parrafo 402)
-    reemplazos.append(("UN MILLÓN SETECIENTOS DIEZ MIL PESOS MONEDA CORRIENTE (COP$1.710.000)",
-                        monto_a_texto_legal(prest["cuota_mensual_total"])))
-    reemplazos.append(("$1.710.000", formato_pesos(prest["cuota_mensual_total"])))
-
-    # Fechas en texto
-    reemplazos.append(("Ocho (8) de abril de dos mil veintiséis (2026)", fecha))
-    reemplazos.append(("ocho (8) de abril del año dos mil veintiséis (2026)", fecha.lower()))
-    reemplazos.append(("ocho (8) días del mes de abril del año dos mil veintiséis (2026)", fecha.lower()))
-    reemplazos.append(("ocho (8) del mes de abril del año dos mil veintiséis (2026)", fecha.lower()))
-    reemplazos.append(("el día ocho (8) de abril del año dos mil veintiséis (2026)", f"el dia {fecha.lower()}"))
-
-    # Participacion de acreedores (PARAGRAFO CUARTO)
-    # Texto original: "cada uno cuenta con una participación equivalente al cincuenta por ciento (50%) del crédito"
-    # Generar texto dinamico segun las participaciones reales
-    if len(acreedores) >= 2:
-        partes_texto = []
-        for a in acreedores:
-            pct = a.get("participacion_porcentaje", "").replace("%", "").strip()
-            monto = a.get("participacion_monto", 0)
-            if pct and monto:
-                partes_texto.append(
-                    f"{a['nombre_completo']} con una participación de {formato_pesos(monto)} "
-                    f"equivalente al {pct}% del crédito"
-                )
-        if partes_texto:
-            texto_participacion = ", y ".join(partes_texto)
-            reemplazos.append((
-                "cada uno cuenta con una participación equivalente al cincuenta por ciento (50%) del crédito",
-                texto_participacion
-            ))
-
-    # Tasa y plazo en texto
-    reemplazos.append(("1.80% mensual anticipado", f"{prest['tasa_mensual']} mensual anticipado"))
-    reemplazos.append(("Sesenta (60) meses", prest["plazo_texto"]))
-
-    # Inmueble en texto
-    if inm.get("matricula_inmobiliaria"):
-        reemplazos.append(("50S-604333", inm["matricula_inmobiliaria"]))
-    if inm.get("direccion_corta"):
-        reemplazos.append(("Calle 19 Sur No. 69A - 48, Bogotá D.C.", inm["direccion_corta"]))
-    if inm.get("chip"):
-        reemplazos.append(("AAA0041FAAF", inm["chip"]))
-
-    # Aplicar reemplazos en todo el documento (párrafos + tablas)
-    for buscar, reemplazar in reemplazos:
-        if buscar and reemplazar and buscar != reemplazar:
-            reemplazar_en_documento(doc, buscar, reemplazar)
 
     # ──────────────────────────────────────────────────────────
     # ELIMINAR PAGINAS VACIAS: quitar bloques de parrafos vacios
