@@ -371,6 +371,8 @@ def escribir_firma(celda, personas):
         # Líneas vacías de separación antes de la firma
         agregar_parrafo("")
         agregar_parrafo("")
+        agregar_parrafo("")
+        agregar_parrafo("")
         # Línea de firma, nombre y CC juntos sin espacio vertical
         agregar_parrafo("__________________________________ ", negrita=True, sin_espacio=True)
         agregar_parrafo(nombre, negrita=True, sin_espacio=True)
