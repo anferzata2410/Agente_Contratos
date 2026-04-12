@@ -495,7 +495,7 @@ function sincronizarMontoDeudor() {
       if (contadorDeudores === 1 && montoDeudor > 0) {
         elPct.value = "100%";
       } else if (montoTotal > 0 && montoDeudor > 0) {
-        elPct.value = ((montoDeudor / montoTotal) * 100).toFixed(1) + "%";
+        elPct.value = Math.round((montoDeudor / montoTotal) * 100) + "%";
       } else {
         elPct.value = "";
       }
@@ -528,7 +528,7 @@ function actualizarParticipaciones() {
     const monto = parseFloat((montoInput.value || "0").replace(/\./g, "").replace(/,/g, "")) || 0;
 
     if (montoTotal > 0 && monto > 0) {
-      pctInput.value = ((monto / montoTotal) * 100).toFixed(1) + "%";
+      pctInput.value = Math.round((monto / montoTotal) * 100) + "%";
     } else {
       pctInput.value = "";
     }
