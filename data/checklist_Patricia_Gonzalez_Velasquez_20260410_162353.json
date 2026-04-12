@@ -1,0 +1,156 @@
+{
+  "formulario": {
+    "tipo_contrato": "Hipoteca",
+    "deudor": {
+      "nombre": "Patricia Gonzalez Velasquez",
+      "cc": "52.202.940",
+      "cc_expedicion": "Bogotá",
+      "direccion": "Km 1,5 via Cota chia casa 30 Cota",
+      "email": "patricia.gonzalez.velasquez@hotmail.com",
+      "telefono": "3005821543",
+      "estado_civil": "Casada",
+      "participacion_monto": "180.000.000",
+      "participacion_porcentaje": "100%"
+    },
+    "deudores": [
+      {
+        "nombre": "Patricia Gonzalez Velasquez",
+        "cc": "52.202.940",
+        "cc_expedicion": "Bogotá",
+        "direccion": "Km 1,5 via Cota chia casa 30 Cota",
+        "email": "patricia.gonzalez.velasquez@hotmail.com",
+        "telefono": "3005821543",
+        "estado_civil": "Casada",
+        "participacion_monto": "180.000.000",
+        "participacion_porcentaje": "100%"
+      }
+    ],
+    "codeudores": [],
+    "acreedores": [
+      {
+        "nombre": "Hernan Jesus Mondol Cabarcas",
+        "cc": "73.160.553",
+        "cc_expedicion": "Cartagena",
+        "direccion": "Cra. 103b #150c-30 casa 110 Agrupación arboleda la campiña, Bogotá",
+        "email": "hernanmondol73@gmail.com",
+        "telefono": "3107668525",
+        "estado_civil": "Unión libre",
+        "participacion_monto": "90.000.000",
+        "participacion_porcentaje": "50.0%",
+        "cuenta_bancaria": ""
+      },
+      {
+        "nombre": "Hawer Alberto Herrera Rodriguez",
+        "cc": "93.365.845",
+        "cc_expedicion": "Ibagué",
+        "direccion": "Carrera 6 53 29 Of. 604 ibagué",
+        "email": "arqui.hawerh@gmail.com",
+        "telefono": "315 7909502",
+        "estado_civil": "Casado",
+        "participacion_monto": "90.000.000",
+        "participacion_porcentaje": "50.0%",
+        "cuenta_bancaria": ""
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50S-604333",
+      "cedula_catastral": "BS 23S 61 44 2",
+      "direccion": "APARTAMENTO NÚMERO SESENTA Y DOS CUARENTA Y OCHO (62-48) DE LA CALLE VEINTITRÉS SUR (23 SUR) SOMETIDO AL RÉGIMEN DE PROPIEDAD HORIZONTAL, UBICADO EN LA CALLE DIECINUEVE SUR (CL 19 SUR) NÚMERO SESENTA Y NUEVE A- CUARENTA Y OCHO (69 A-48), DE LA CIUDAD DE BOGOTÁ D.C. DEPARTAMENTO DE CUNDINAMARCA.",
+      "descripcion": "Está desarrollado en dos (2) plantas con área privada total de ciento cuatro metros cuadrados con nueve decímetros de metro cuadrado (104.09 M2), área cubierta de setenta y cinco metros cuadrados con novecientos quince decímetros de metro cuadrado (75.915 M2), área libre de veintiocho metros cuadrados ciento setenta y cinco milímetros cuadrados (28.175 M2) y altura variable. Está separado de sus colindantes designados por un elemento estructural de propiedad común tales como muros interiores y de fachada columna y placas\". \"El primer piso... Consta de sala, comedor, cocina, escalera, una alcoba, jardín interior, antejardín y garaje descubierto para un auto y dos baños\". El segundo piso \"Consta de dos (2) alcobas, un (1) baño.",
+      "linderos": "La escritura detalla linderos especiales para el primer y segundo piso, así como los linderos generales del edificio. A continuación los Linderos Generales: \"EL EDIFICIO DEL CUAL HACE PARTE EL INMUEBLE ANTES DESCRITO ESTÁ CONSTRUIDO EN UN LOTE DE TERRENO, con una cabida o extensión superficiaria aproximada de ciento setenta y cinco metros cuadrados (175.00 M2) y se encuentra comprendido dentro de los siguientes linderos tomados del título de adquisición: POR EL NOROESTE: En extensión de veinticinco metros (25.00 mts) linda con el lote número veintisiete (27) de la misma manzana y urbanización. POR EL SURESTE: En extensión de veinticinco metros (25.00 mts) linda con el lote número veinticinco (25) de la misma manzana y urbanización. POR EL NORESTE: En extensión de siete metros (7.00 mts) linda con la urbanización Villa Claudia. POR EL SUROESTE: En extensión de siete metros (7.00 mts) linda con la calle veintitrés sur (23 sur) de la nomenclatura de Santafé de Bogotá\".",
+      "chip": "AAA0041FAAF"
+    },
+    "prestamo": {
+      "monto": "180.000.000",
+      "plazo_meses": "60",
+      "tasa_mensual": "1.80%",
+      "cuota_mensual": "3.240.000",
+      "forma_pago": "Solo intereses",
+      "comision_aluri": "9.000.000",
+      "observaciones": "Con Boleta de registro se da a la señora Patricia el 35% del valor total de la operación ($180.000.000), Hawer Alberto Herrera Rodriguez y Hernan Jesus Mondol Cabarcas dan un monto $31.500.000 c/u para un total de $63.000.0000."
+    },
+    "fecha_creacion": "2026-04-10T14:23:53.408Z"
+  },
+  "enriquecido": {
+    "fecha_firma": "Diez (10) de abril de dos mil veintiséis (2026)",
+    "deudores": [
+      {
+        "nombre_completo": "PATRICIA GONZALEZ VELASQUEZ",
+        "nombre_completo_mayuscula": "PATRICIA GONZALEZ VELASQUEZ",
+        "cc": "52.202.940",
+        "cc_expedicion": "Bogotá",
+        "direccion": "Km 1,5 via Cota chia casa 30 Cota",
+        "email": "patricia.gonzalez.velasquez@hotmail.com",
+        "telefono": "3005821543",
+        "estado_civil": "Casada",
+        "municipio": "Bogotá"
+      }
+    ],
+    "codeudores": [],
+    "acreedores": [
+      {
+        "nombre_completo": "HERNAN JESUS MONDOL CABARCAS",
+        "nombre_completo_mayuscula": "HERNAN JESUS MONDOL CABARCAS",
+        "cc": "73.160.553",
+        "cc_expedicion": "Cartagena",
+        "direccion": "Cra. 103b #150c-30 casa 110 Agrupación arboleda la campiña, Bogotá",
+        "email": "hernanmondol73@gmail.com",
+        "telefono": "3107668525",
+        "estado_civil": "Unión libre",
+        "participacion_porcentaje": "50.0%",
+        "participacion_monto": 90000000,
+        "participacion_texto": "NOVENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$90.000.000)",
+        "cuenta_bancaria": "",
+        "cuota_mensual_individual": 1620000,
+        "cuota_mensual_texto": "Un millón seiscientos veinte mil pesos moneda corriente (COP$1.620.000)",
+        "comision_aluri_individual": 4500000,
+        "monto_inicial": 31500000,
+        "monto_restante": 58500000
+      },
+      {
+        "nombre_completo": "HAWER ALBERTO HERRERA RODRIGUEZ",
+        "nombre_completo_mayuscula": "HAWER ALBERTO HERRERA RODRIGUEZ",
+        "cc": "93.365.845",
+        "cc_expedicion": "Ibagué",
+        "direccion": "Carrera 6 53 29 Of. 604 ibagué",
+        "email": "arqui.hawerh@gmail.com",
+        "telefono": "315 7909502",
+        "estado_civil": "Casado",
+        "participacion_porcentaje": "50.0%",
+        "participacion_monto": 90000000,
+        "participacion_texto": "NOVENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$90.000.000)",
+        "cuenta_bancaria": "",
+        "cuota_mensual_individual": 1620000,
+        "cuota_mensual_texto": "Un millón seiscientos veinte mil pesos moneda corriente (COP$1.620.000)",
+        "comision_aluri_individual": 4500000,
+        "monto_inicial": 31500000,
+        "monto_restante": 58500000
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50S-604333",
+      "oficina_registro": "",
+      "cedula_catastral": "BS 23S 61 44 2",
+      "chip": "AAA0041FAAF",
+      "direccion_corta": "APARTAMENTO NÚMERO SESENTA Y DOS CUARENTA Y OCHO (62-48) DE LA CALLE VEINTITRÉS SUR (23 SUR) SOMETIDO AL RÉGIMEN DE PROPIEDAD HORIZONTAL, UBICADO EN LA CALLE DIECINUEVE SUR (CL 19 SUR) NÚMERO SESENTA Y NUEVE A- CUARENTA Y OCHO (69 A-48), DE LA CIUDAD DE BOGOTÁ D.C. DEPARTAMENTO DE CUNDINAMARCA.",
+      "descripcion_completa": "Está desarrollado en dos (2) plantas con área privada total de ciento cuatro metros cuadrados con nueve decímetros de metro cuadrado (104.09 M2), área cubierta de setenta y cinco metros cuadrados con novecientos quince decímetros de metro cuadrado (75.915 M2), área libre de veintiocho metros cuadrados ciento setenta y cinco milímetros cuadrados (28.175 M2) y altura variable. Está separado de sus colindantes designados por un elemento estructural de propiedad común tales como muros interiores y de fachada columna y placas\". \"El primer piso... Consta de sala, comedor, cocina, escalera, una alcoba, jardín interior, antejardín y garaje descubierto para un auto y dos baños\". El segundo piso \"Consta de dos (2) alcobas, un (1) baño.",
+      "linderos": "La escritura detalla linderos especiales para el primer y segundo piso, así como los linderos generales del edificio. A continuación los Linderos Generales: \"EL EDIFICIO DEL CUAL HACE PARTE EL INMUEBLE ANTES DESCRITO ESTÁ CONSTRUIDO EN UN LOTE DE TERRENO, con una cabida o extensión superficiaria aproximada de ciento setenta y cinco metros cuadrados (175.00 M2) y se encuentra comprendido dentro de los siguientes linderos tomados del título de adquisición: POR EL NOROESTE: En extensión de veinticinco metros (25.00 mts) linda con el lote número veintisiete (27) de la misma manzana y urbanización. POR EL SURESTE: En extensión de veinticinco metros (25.00 mts) linda con el lote número veinticinco (25) de la misma manzana y urbanización. POR EL NORESTE: En extensión de siete metros (7.00 mts) linda con la urbanización Villa Claudia. POR EL SUROESTE: En extensión de siete metros (7.00 mts) linda con la calle veintitrés sur (23 sur) de la nomenclatura de Santafé de Bogotá\"."
+    },
+    "prestamo": {
+      "monto_total": 180000000,
+      "monto_total_texto": "CIENTO OCHENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$180.000.000)",
+      "monto_inicial_credito": 63000000,
+      "monto_inicial_texto": "SESENTA Y TRES MILLONES DE PESOS MONEDA CORRIENTE (COP$63.000.000)",
+      "monto_restante": 117000000,
+      "monto_restante_texto": "CIENTO DIECISIETE MILLONES DE PESOS MONEDA CORRIENTE (COP$117.000.000)",
+      "plazo_meses": 60,
+      "plazo_texto": "Sesenta (60) meses",
+      "tasa_mensual": "1.80%",
+      "cuota_mensual_total": 3240000,
+      "cuota_mensual_total_texto": "Tres millones doscientos cuarenta mil pesos moneda corriente (COP$3.240.000)",
+      "comision_aluri_total": 9000000,
+      "comision_aluri_por_acreedor": 4500000,
+      "servicios_aluri_texto": "$4.500.000"
+    }
+  }
+}

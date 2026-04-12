@@ -1,0 +1,135 @@
+{
+  "formulario": {
+    "tipo_contrato": "Hipoteca",
+    "deudor": {
+      "nombre": "Patricia Gonzalez Velasquez",
+      "cc": "52.202.940",
+      "cc_expedicion": "Bogota",
+      "direccion": "Km 1,5 via Cota Chia casa 30 Cota",
+      "email": "patricia.gonzalez.velasquez@hotmail.com",
+      "telefono": "3005821543",
+      "estado_civil": "Casada con sociedad conyugal vigente"
+    },
+    "acreedores": [
+      {
+        "nombre": "Hernan Jesus Mondol Cabarcas",
+        "cc": "73.160.553",
+        "cc_expedicion": "Cartagena",
+        "direccion": "Cra. 103b #150c-30 casa 110 Agrupacion arboleda la campina, Bogota",
+        "email": "hernanmondol73@gmail.com",
+        "telefono": "3107668525",
+        "estado_civil": "Union libre",
+        "participacion_monto": "90.000.000",
+        "participacion_porcentaje": "50%",
+        "cuenta_bancaria": "Cuenta de ahorros numero 19807533706 de Bancolombia"
+      },
+      {
+        "nombre": "Hawer Alberto Herrera Rodriguez",
+        "cc": "93.365.845",
+        "cc_expedicion": "Ibague",
+        "direccion": "Carrera 6 53 29 Of. 604 Ibague",
+        "email": "arqui.hawerh@gmail.com",
+        "telefono": "3157909502",
+        "estado_civil": "Casado con sociedad conyugal vigente",
+        "participacion_monto": "90.000.000",
+        "participacion_porcentaje": "50%",
+        "cuenta_bancaria": "Cuenta de ahorros numero 15341323620 de Bancolombia"
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50S-604333",
+      "cedula_catastral": "BS 23S 61 44 2",
+      "chip": "AAA0041FAAF",
+      "direccion": "Calle 19 Sur No. 69A - 48, Bogota D.C."
+    },
+    "prestamo": {
+      "monto": "180.000.000",
+      "plazo_meses": "60",
+      "tasa_mensual": "1.80%",
+      "cuota_mensual": "3.240.000",
+      "forma_pago": "Solo intereses",
+      "comision_aluri": "9.000.000"
+    }
+  },
+  "enriquecido": {
+    "fecha_firma": "Ocho (8) de abril de dos mil veintiséis (2026)",
+    "deudores": [
+      {
+        "nombre_completo": "PATRICIA GONZALEZ VELASQUEZ",
+        "nombre_completo_mayuscula": "PATRICIA GONZALEZ VELASQUEZ",
+        "cc": "52.202.940",
+        "cc_expedicion": "Bogota",
+        "direccion": "Km 1,5 via Cota Chia casa 30 Cota",
+        "email": "patricia.gonzalez.velasquez@hotmail.com",
+        "telefono": "3005821543",
+        "estado_civil": "Casada con sociedad conyugal vigente",
+        "municipio": "Bogota"
+      }
+    ],
+    "acreedores": [
+      {
+        "nombre_completo": "HERNAN JESUS MONDOL CABARCAS",
+        "nombre_completo_mayuscula": "HERNAN JESUS MONDOL CABARCAS",
+        "cc": "73.160.553",
+        "cc_expedicion": "Cartagena",
+        "direccion": "Cra. 103b #150c-30 casa 110 Agrupacion arboleda la campina, Bogota",
+        "email": "hernanmondol73@gmail.com",
+        "telefono": "3107668525",
+        "estado_civil": "Union libre",
+        "participacion_porcentaje": "50%",
+        "participacion_monto": 90000000,
+        "participacion_texto": "NOVENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$90.000.000)",
+        "cuenta_bancaria": "Cuenta de ahorros numero 19807533706 de Bancolombia",
+        "cuota_mensual_individual": 1620000,
+        "cuota_mensual_texto": "Un millón seiscientos veinte mil pesos moneda corriente (COP$1.620.000)",
+        "comision_aluri_individual": 4500000,
+        "monto_inicial": 31499999,
+        "monto_restante": 58500001
+      },
+      {
+        "nombre_completo": "HAWER ALBERTO HERRERA RODRIGUEZ",
+        "nombre_completo_mayuscula": "HAWER ALBERTO HERRERA RODRIGUEZ",
+        "cc": "93.365.845",
+        "cc_expedicion": "Ibague",
+        "direccion": "Carrera 6 53 29 Of. 604 Ibague",
+        "email": "arqui.hawerh@gmail.com",
+        "telefono": "3157909502",
+        "estado_civil": "Casado con sociedad conyugal vigente",
+        "participacion_porcentaje": "50%",
+        "participacion_monto": 90000000,
+        "participacion_texto": "NOVENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$90.000.000)",
+        "cuenta_bancaria": "Cuenta de ahorros numero 15341323620 de Bancolombia",
+        "cuota_mensual_individual": 1620000,
+        "cuota_mensual_texto": "Un millón seiscientos veinte mil pesos moneda corriente (COP$1.620.000)",
+        "comision_aluri_individual": 4500000,
+        "monto_inicial": 31499999,
+        "monto_restante": 58500001
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50S-604333",
+      "oficina_registro": "",
+      "cedula_catastral": "BS 23S 61 44 2",
+      "chip": "AAA0041FAAF",
+      "direccion_corta": "Calle 19 Sur No. 69A - 48, Bogota D.C.",
+      "descripcion_completa": "",
+      "linderos": ""
+    },
+    "prestamo": {
+      "monto_total": 180000000,
+      "monto_total_texto": "CIENTO OCHENTA MILLONES DE PESOS MONEDA CORRIENTE (COP$180.000.000)",
+      "monto_inicial_credito": 62999999,
+      "monto_inicial_texto": "SESENTA Y DOS MILLONES NOVECIENTOS NOVENTA Y NUEVE MIL NOVECIENTOS NOVENTA Y NUEVE DE PESOS MONEDA CORRIENTE (COP$62.999.999)",
+      "monto_restante": 117000001,
+      "monto_restante_texto": "CIENTO DIECISIETE MILLONES UNO DE PESOS MONEDA CORRIENTE (COP$117.000.001)",
+      "plazo_meses": 60,
+      "plazo_texto": "Sesenta (60) meses",
+      "tasa_mensual": "1.80%",
+      "cuota_mensual_total": 3240000,
+      "cuota_mensual_total_texto": "Tres millones doscientos cuarenta mil pesos moneda corriente (COP$3.240.000)",
+      "comision_aluri_total": 9000000,
+      "comision_aluri_por_acreedor": 4500000,
+      "servicios_aluri_texto": "$4.500.000"
+    }
+  }
+}

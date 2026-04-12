@@ -467,9 +467,20 @@ function sincronizarMontoDeudor() {
   const elMonto = document.getElementById("prestamo_monto");
   if (elMonto) elMonto.value = monto;
 
+  // Monto total numerico
+  const montoTotal = parseInt((monto || "0").replace(/\./g, ""), 10) || 0;
+
+  // Calcular % de participacion de cada deudor
+  for (let i = 1; i <= contadorDeudores; i++) {
+    const montoDeudor = parseInt((val(`deudor_${i}_participacion_monto`) || "0").replace(/\./g, ""), 10) || 0;
+    const elPct = document.getElementById(`deudor_${i}_participacion_porcentaje`);
+    if (elPct && montoTotal > 0 && montoDeudor > 0) {
+      elPct.value = ((montoDeudor / montoTotal) * 100).toFixed(1) + "%";
+    }
+  }
+
   // Comision Aluri = 5% del monto total
-  const montoNum = parseInt((monto || "0").replace(/\./g, ""), 10) || 0;
-  const comision = Math.round(montoNum * 5 / 100);
+  const comision = Math.round(montoTotal * 5 / 100);
   const elComision = document.getElementById("prestamo_comision");
   if (elComision && comision > 0) {
     elComision.value = comision.toLocaleString("es-CO").replace(/,/g, ".");
