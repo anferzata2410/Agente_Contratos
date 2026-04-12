@@ -858,6 +858,18 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                 aplicar_keep(doc.paragraphs[j], keep_next=True, keep_lines=False)
             break
 
+    # REGLA FIJA: PARAGRAFO TERCERO + tabla de acreedores + texto siguiente juntos
+    for i, p in enumerate(doc.paragraphs):
+        if "GRAFO TERCERO" in p.text and "ACREEDORES" in p.text:
+            # keepNext en PARAGRAFO TERCERO y los vacios/parrafos hasta el siguiente titulo
+            for j in range(i, min(i + 6, len(doc.paragraphs))):
+                pj = doc.paragraphs[j]
+                aplicar_keep(pj, keep_next=True, keep_lines=False)
+                # Parar si llegamos al PARAGRAFO CUARTO
+                if j > i and "GRAFO CUARTO" in pj.text:
+                    break
+            break
+
     # REGLA FIJA: "Anexo No. 2" nunca se separa de "PAGARÉ No. 1"
     # Eliminar parrafos vacios entre ellos y antes de Anexo No. 2
     for i, p in enumerate(doc.paragraphs):
