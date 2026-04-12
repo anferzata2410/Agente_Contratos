@@ -20,7 +20,7 @@ app = Flask(__name__)
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
-TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato mutuo solo interés.docx"
+TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato_PLANTILLA.docx"
 OUTPUT_DIR = BASE_DIR / "Contratos_Generados"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
