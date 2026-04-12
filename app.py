@@ -263,22 +263,22 @@ def enriquecer_datos(datos_form: dict) -> dict:
 # GENERAR CONTRATO DESDE FORMULARIO
 # ═══════════════════════════════════════════════
 
-def insertar_fila_tabla(tabla, despues_de_fila, col0_texto, col1_texto):
+def insertar_fila_tabla(tabla, despues_de_fila, col0_texto, col1_texto, negrita_col1=False):
     """
     Inserta una fila nueva en una tabla DESPUES de la fila indicada.
     Copia el formato de la fila de referencia.
     """
-    from docx.oxml import OxmlElement
     from copy import deepcopy
 
     fila_ref = tabla.rows[despues_de_fila]
     nueva_tr = deepcopy(fila_ref._tr)
 
     # Limpiar contenido de la nueva fila
-    for tc in nueva_tr.findall('.//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}tc'):
-        for p in tc.findall('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p'):
-            for r in p.findall('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r'):
-                for t in r.findall('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t'):
+    ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    for tc in nueva_tr.findall(f'.//{ns_w}tc'):
+        for p in tc.findall(f'{ns_w}p'):
+            for r in p.findall(f'{ns_w}r'):
+                for t in r.findall(f'{ns_w}t'):
                     t.text = ""
 
     # Insertar despues de la fila de referencia
@@ -297,11 +297,15 @@ def insertar_fila_tabla(tabla, despues_de_fila, col0_texto, col1_texto):
         p1 = nueva_fila.cells[1].paragraphs[0]
         if p1.runs:
             p1.runs[0].text = col1_texto
+            if negrita_col1:
+                p1.runs[0].bold = True
         else:
-            p1.add_run(col1_texto)
+            run = p1.add_run(col1_texto)
+            if negrita_col1:
+                run.bold = True
 
 
-def escribir_celda(tabla, fila, col, texto):
+def escribir_celda(tabla, fila, col, texto, negrita=False):
     """Escribe texto en una celda, limpiando TODO el contenido previo (runs, hyperlinks, etc.)."""
     celda = tabla.rows[fila].cells[col]
     ns_w = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -316,8 +320,12 @@ def escribir_celda(tabla, fila, col, texto):
     para = celda.paragraphs[0]
     if para.runs:
         para.runs[0].text = texto
+        if negrita:
+            para.runs[0].bold = True
     else:
-        para.add_run(texto)
+        run = para.add_run(texto)
+        if negrita:
+            run.bold = True
 
 
 def escribir_firma(celda, personas):
@@ -415,7 +423,7 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         escribir_celda(t0, 7, 1, inm["direccion_corta"])
 
     # Fila 9-14: Deudor principal
-    escribir_celda(t0, 9, 1, deudor["nombre_completo"])
+    escribir_celda(t0, 9, 1, deudor["nombre_completo"], negrita=True)
     escribir_celda(t0, 10, 1, f"C.C. No. {deudor['cc']}")
     escribir_celda(t0, 11, 1, deudor["estado_civil"])
     escribir_celda(t0, 12, 1, deudor["direccion"])
@@ -428,8 +436,9 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         encabezado = f"INFORMACIÓN DEL DEUDOR {ide + 2}"
         insertar_fila_tabla(t0, fila_insercion, encabezado, encabezado)
         fila_insercion += 1
+        insertar_fila_tabla(t0, fila_insercion, "Nombre", dex["nombre_completo"], negrita_col1=True)
+        fila_insercion += 1
         campos_dex = [
-            ("Nombre", dex["nombre_completo"]),
             ("Documento de identidad", f"C.C. No. {dex['cc']}"),
             ("Estado civil", dex.get("estado_civil", "")),
             ("Dirección de notificación", dex.get("direccion", "")),
@@ -446,8 +455,9 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         encabezado = f"INFORMACIÓN DEL CODEUDOR {ic + 1}"
         insertar_fila_tabla(t0, fila_insercion, encabezado, encabezado)
         fila_insercion += 1
+        insertar_fila_tabla(t0, fila_insercion, "Nombre", cod["nombre_completo"], negrita_col1=True)
+        fila_insercion += 1
         campos_cod = [
-            ("Nombre", cod["nombre_completo"]),
             ("Documento de identidad", f"C.C. No. {cod['cc']}"),
             ("Estado civil", cod.get("estado_civil", "")),
             ("Dirección de notificación", cod.get("direccion", "")),
@@ -468,14 +478,14 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     fila_acr2 = 22 + offset
 
     if acr1:
-        escribir_celda(t0, fila_acr1, 1, acr1["nombre_completo"])
+        escribir_celda(t0, fila_acr1, 1, acr1["nombre_completo"], negrita=True)
         escribir_celda(t0, fila_acr1 + 1, 1, f"C.C. No. {acr1['cc']}")
         escribir_celda(t0, fila_acr1 + 2, 1, acr1.get("estado_civil", ""))
         escribir_celda(t0, fila_acr1 + 3, 1, acr1.get("direccion", ""))
         escribir_celda(t0, fila_acr1 + 4, 1, acr1.get("email", ""))
         escribir_celda(t0, fila_acr1 + 5, 1, acr1.get("telefono", ""))
     if acr2:
-        escribir_celda(t0, fila_acr2, 1, acr2["nombre_completo"])
+        escribir_celda(t0, fila_acr2, 1, acr2["nombre_completo"], negrita=True)
         escribir_celda(t0, fila_acr2 + 1, 1, f"C.C. No. {acr2['cc']}")
         escribir_celda(t0, fila_acr2 + 2, 1, acr2.get("estado_civil", ""))
         escribir_celda(t0, fila_acr2 + 3, 1, acr2.get("direccion", ""))
