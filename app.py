@@ -847,6 +847,18 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         if patron_titulo.match(texto):
             aplicar_keep(p, keep_next=True, keep_lines=True)
 
+    # REGLA FIJA: "Anexo No. 2" nunca se separa de "PAGARÉ No. 1"
+    # Aplicar keepNext a los parrafos vacios entre ellos
+    for i, p in enumerate(doc.paragraphs):
+        texto = p.text.strip()
+        if texto in ("Anexo No. 2", "Anexo No. 2 "):
+            for j in range(i + 1, min(i + 5, len(doc.paragraphs))):
+                pj = doc.paragraphs[j]
+                if pj.text.strip().startswith("PAGAR"):
+                    break
+                aplicar_keep(pj, keep_next=True, keep_lines=False)
+            break
+
     # ── Saltos de pagina fijos para secciones principales ──
 
     # Salto antes de la lista de anexos ("Anexo No. 1: Escritura...")
