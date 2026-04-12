@@ -776,8 +776,8 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         # CLAUSULAS siempre empieza en pagina 2
         if texto in ("CLÁUSULAS", "CL\u00c1USULAS", "CLAUSULAS"):
             necesita_salto = True
-        # Pagares
-        elif texto.startswith("PAGAR") and "No." in texto:
+        # Anexo No. 2 (salto aqui, NO en el pagare)
+        elif texto in ("Anexo No. 2", "Anexo No. 2 "):
             necesita_salto = True
         # Anexo No. 3 titulo (sin ":" para no confundir con la referencia)
         elif texto in ("Anexo No. 3", "Anexo No. 3 "):
@@ -848,15 +848,28 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
             aplicar_keep(p, keep_next=True, keep_lines=True)
 
     # REGLA FIJA: "Anexo No. 2" nunca se separa de "PAGARÉ No. 1"
-    # Aplicar keepNext a los parrafos vacios entre ellos
+    # Eliminar parrafos vacios entre ellos y antes de Anexo No. 2
     for i, p in enumerate(doc.paragraphs):
         texto = p.text.strip()
         if texto in ("Anexo No. 2", "Anexo No. 2 "):
-            for j in range(i + 1, min(i + 5, len(doc.paragraphs))):
-                pj = doc.paragraphs[j]
-                if pj.text.strip().startswith("PAGAR"):
+            # Eliminar vacios ANTES de Anexo No. 2
+            for j in range(i - 1, max(i - 10, 0), -1):
+                if doc.paragraphs[j].text.strip() == "":
+                    body.remove(doc.paragraphs[j]._element)
+                else:
                     break
-                aplicar_keep(pj, keep_next=True, keep_lines=False)
+            # Eliminar vacios DESPUES de Anexo No. 2 (entre el y PAGARE)
+            # Re-buscar porque indices cambiaron
+            for k, p2 in enumerate(doc.paragraphs):
+                if p2.text.strip() in ("Anexo No. 2", "Anexo No. 2 "):
+                    for m in range(k + 1, min(k + 5, len(doc.paragraphs))):
+                        pm = doc.paragraphs[m]
+                        if pm.text.strip() == "":
+                            body.remove(pm._element)
+                            break  # Solo 1 vacio, re-iterar
+                        else:
+                            break
+                    break
             break
 
     # ── Saltos de pagina fijos para secciones principales ──
