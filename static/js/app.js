@@ -29,16 +29,11 @@ function iniciarFormularioVacio() {
   document.getElementById("codeudores-container").innerHTML = "";
   contadorCodeudores = 0;
 
-  // Limpiar campos fijos (readonly y demas)
-  const camposFijos = ["tipo_contrato", "prestamo_monto", "prestamo_comision",
-    "prestamo_plazo", "prestamo_tasa", "prestamo_cuota", "prestamo_forma_pago",
-    "prestamo_observaciones", "inmueble_matricula", "inmueble_cedula_catastral",
-    "inmueble_chip", "inmueble_direccion", "inmueble_descripcion", "inmueble_linderos"];
-  camposFijos.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.value = "";
-  });
-
+  // Limpiar inmueble y prestamo (contenedores vacios, botones visibles)
+  document.getElementById("inmueble-container").innerHTML = "";
+  document.getElementById("btn-agregar-inmueble").style.display = "";
+  document.getElementById("prestamo-container").innerHTML = "";
+  document.getElementById("btn-agregar-prestamo").style.display = "";
 }
 
 // ══════════════════════════════════════════════
@@ -159,7 +154,8 @@ function rellenarFormulario(datos) {
     agregarAcreedor();
   }
 
-  // ── Inmueble ──
+  // ── Inmueble (desplegar y rellenar) ──
+  mostrarInmueble();
   const inm = datos.inmueble || {};
   setVal("inmueble_matricula", inm.matricula_inmobiliaria || "");
   setVal("inmueble_cedula_catastral", inm.cedula_catastral || "");
@@ -168,7 +164,8 @@ function rellenarFormulario(datos) {
   setVal("inmueble_descripcion", inm.descripcion || "");
   setVal("inmueble_linderos", inm.linderos || "");
 
-  // ── Prestamo ──
+  // ── Prestamo (desplegar y rellenar) ──
+  mostrarPrestamo();
   const p = datos.prestamo || {};
   setVal("prestamo_monto", p.monto || "");
   setVal("prestamo_plazo", p.plazo_meses || "");
@@ -306,6 +303,80 @@ function agregarAcreedor() {
   const container = document.getElementById("acreedores-container");
   container.insertAdjacentHTML("beforeend", crearCardPersona("acreedor", contadorAcreedores, true));
   actualizarParticipaciones();
+}
+
+function mostrarInmueble() {
+  const container = document.getElementById("inmueble-container");
+  document.getElementById("btn-agregar-inmueble").style.display = "none";
+  container.innerHTML = `
+    <div class="form-grid">
+      <div class="field">
+        <label>No. Matricula Inmobiliaria <span class="required">*</span></label>
+        <input type="text" id="inmueble_matricula" placeholder="50S-XXXXXX">
+      </div>
+      <div class="field">
+        <label>Cedula catastral</label>
+        <input type="text" id="inmueble_cedula_catastral" placeholder="BS 23S 61 44 2">
+      </div>
+      <div class="field">
+        <label>Codigo CHIP</label>
+        <input type="text" id="inmueble_chip" placeholder="AAA0000XXXX">
+      </div>
+      <div class="field full-width">
+        <label>Direccion del inmueble <span class="required">*</span></label>
+        <input type="text" id="inmueble_direccion" placeholder="Direccion completa del inmueble">
+      </div>
+      <div class="field full-width">
+        <label>Descripcion del inmueble</label>
+        <textarea id="inmueble_descripcion" rows="4" placeholder="Area, numero de pisos, distribucion, etc."></textarea>
+      </div>
+      <div class="field full-width">
+        <label>Linderos</label>
+        <textarea id="inmueble_linderos" rows="4" placeholder="Linderos del inmueble segun escritura"></textarea>
+      </div>
+    </div>
+  `;
+}
+
+function mostrarPrestamo() {
+  const container = document.getElementById("prestamo-container");
+  document.getElementById("btn-agregar-prestamo").style.display = "none";
+  container.innerHTML = `
+    <div class="form-grid">
+      <div class="field">
+        <label>Monto del prestamo <span class="required">*</span></label>
+        <input type="text" id="prestamo_monto" placeholder="180.000.000" readonly>
+      </div>
+      <div class="field">
+        <label>Plazo (meses) <span class="required">*</span></label>
+        <input type="number" id="prestamo_plazo" placeholder="60" min="1" max="360">
+      </div>
+      <div class="field">
+        <label>Tasa mensual anticipada <span class="required">*</span></label>
+        <input type="text" id="prestamo_tasa" placeholder="1.80%">
+      </div>
+      <div class="field">
+        <label>Valor cuota mensual</label>
+        <input type="text" id="prestamo_cuota" placeholder="3.240.000" oninput="formatearMonto(this)">
+      </div>
+      <div class="field">
+        <label>Forma de pago <span class="required">*</span></label>
+        <select id="prestamo_forma_pago">
+          <option value="">Seleccionar...</option>
+          <option value="Solo intereses">Solo intereses</option>
+          <option value="Interes y capital">Interes y capital</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Comision Aluri</label>
+        <input type="text" id="prestamo_comision" placeholder="9.000.000" readonly>
+      </div>
+      <div class="field full-width">
+        <label>Observaciones</label>
+        <textarea id="prestamo_observaciones" rows="3" placeholder="Condiciones especiales, notas adicionales..."></textarea>
+      </div>
+    </div>
+  `;
 }
 
 function eliminarPersona(tipo, idx) {
