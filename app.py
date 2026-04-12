@@ -596,6 +596,39 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
                             r_el.append(t_el)
                             p_el.append(r_el)
             tbl_el.append(nueva_tr)
+
+        # Evitar que la tabla se divida entre paginas:
+        # 1. cantSplit en todas las filas de la tabla
+        for tr in tbl_el.findall(f'{ns_w}tr'):
+            trPr = tr.find(f'{ns_w}trPr')
+            if trPr is None:
+                trPr = tr.makeelement(f'{ns_w}trPr', {})
+                tr.insert(0, trPr)
+            if trPr.find(f'{ns_w}cantSplit') is None:
+                cs = trPr.makeelement(f'{ns_w}cantSplit', {})
+                trPr.append(cs)
+
+        # 2. keepNext en los parrafos vacios entre PARAGRAFO TERCERO y la tabla
+        #    para que Word no corte entre el texto y la tabla
+        for p in doc.paragraphs:
+            if "GRAFO TERCERO" in p.text and "ACREEDORES" in p.text:
+                # Aplicar keepNext a este parrafo y los siguientes vacios
+                siguiente = p._element.getnext()
+                while siguiente is not None:
+                    tag = siguiente.tag.split('}')[-1]
+                    if tag == 'tbl':
+                        break  # Llegamos a la tabla
+                    if tag == 'p':
+                        pPr = siguiente.find(f'{ns_w}pPr')
+                        if pPr is None:
+                            pPr = siguiente.makeelement(f'{ns_w}pPr', {})
+                            siguiente.insert(0, pPr)
+                        if pPr.find(f'{ns_w}keepNext') is None:
+                            kn = pPr.makeelement(f'{ns_w}keepNext', {})
+                            pPr.append(kn)
+                    siguiente = siguiente.getnext()
+                break
+
         break
 
     # ──────────────────────────────────────────
