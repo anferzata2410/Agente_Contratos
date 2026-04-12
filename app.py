@@ -143,12 +143,11 @@ def enriquecer_datos(datos_form: dict) -> dict:
     inmueble = datos_form.get("inmueble", {})
     prestamo = datos_form.get("prestamo", {})
 
-    # Monto total del credito: prioridad a la participacion del deudor principal,
-    # luego al campo "monto" del prestamo como fallback
-    deudor_principal = deudores_raw[0] if deudores_raw else {}
-    monto_deudor = limpiar_monto(deudor_principal.get("participacion_monto", "0"))
+    # Monto total del credito = suma de participaciones de TODOS los deudores
+    # Fallback al campo "monto" del prestamo si no hay participaciones
+    monto_deudores = sum(limpiar_monto(d.get("participacion_monto", "0")) for d in deudores_raw)
     monto_prestamo = limpiar_monto(prestamo.get("monto", "0"))
-    monto_total = monto_deudor if monto_deudor > 0 else monto_prestamo
+    monto_total = monto_deudores if monto_deudores > 0 else monto_prestamo
 
     plazo = int(prestamo.get("plazo_meses", "60") or "60")
     tasa = prestamo.get("tasa_mensual", "1.80%")

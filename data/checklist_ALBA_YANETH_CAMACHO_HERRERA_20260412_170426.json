@@ -1,0 +1,178 @@
+{
+  "formulario": {
+    "tipo_contrato": "Hipoteca",
+    "deudor": {
+      "nombre": "ALBA YANETH CAMACHO HERRERA",
+      "cc": "23.926.821",
+      "cc_expedicion": "PESCA BOYACA",
+      "direccion": "carrera 84#77a-71 Bogotá",
+      "email": "camachoyaneth98@gmail.com",
+      "telefono": "+57 3138909489",
+      "estado_civil": "soltera con unión marital de hecho",
+      "participacion_monto": "51.000.000",
+      "participacion_porcentaje": "61%"
+    },
+    "deudores": [
+      {
+        "nombre": "ALBA YANETH CAMACHO HERRERA",
+        "cc": "23.926.821",
+        "cc_expedicion": "PESCA BOYACA",
+        "direccion": "carrera 84#77a-71 Bogotá",
+        "email": "camachoyaneth98@gmail.com",
+        "telefono": "+57 3138909489",
+        "estado_civil": "soltera con unión marital de hecho",
+        "participacion_monto": "51.000.000",
+        "participacion_porcentaje": "61%"
+      },
+      {
+        "nombre": "JOSE WILSON GOMEZ ZAPATA",
+        "cc": "80.755.506",
+        "cc_expedicion": "BOGOTÁ D.C.",
+        "direccion": "",
+        "email": "",
+        "telefono": "",
+        "estado_civil": "",
+        "participacion_monto": "33.000.000",
+        "participacion_porcentaje": "39%"
+      }
+    ],
+    "codeudores": [],
+    "acreedores": [
+      {
+        "nombre": "SERGIO ANDRÉS VELANDIA CETINA",
+        "cc": "1.018.450.779",
+        "cc_expedicion": "Bogotá D.C.",
+        "direccion": "CARRERA 21 # 95 - 63, BOGOTÁ D.C.",
+        "email": "sa.velandia153@gmail.com",
+        "telefono": "+57 3103378408",
+        "estado_civil": "Casado con sociedad conyugal vigente",
+        "participacion_monto": "73.000.000",
+        "participacion_porcentaje": "86.90%",
+        "cuenta_bancaria": ""
+      },
+      {
+        "nombre": "JONATHAN CETINA CUELLAR",
+        "cc": "1.026.550.415",
+        "cc_expedicion": "Bogotá D.C.",
+        "direccion": "calle 126 # 48 - 07, Bogotá D.C.",
+        "email": "jonathan.cetina86@gmail.com",
+        "telefono": "+57 3105870085",
+        "estado_civil": "soltero sin unión marital de hecho",
+        "participacion_monto": "11.000.000",
+        "participacion_porcentaje": "13.10%",
+        "cuenta_bancaria": ""
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50N-20617488",
+      "cedula_catastral": "009248078200000000",
+      "direccion": "CARRERA 147 NÚMERO 145 - 40",
+      "descripcion": "CASA No. 0018 DEL CONJUNTO RESIDENCIAL QUINTAS DE SANTA RITA IV - PROPIEDAD HORIZONTAL, UBICADO EN LA CIUDAD DE BOGOTÁ D.C. E IDENTIFICADO EN LA NOMENCLATURA URBANA CON EL NÚMERO CIENTO CUARENTA Y CINCO - CUARENTA (145 - 40) DE LA CARRERA CIENTO CUARENTA Y SIETE (147)",
+      "linderos": "NORTE: OCHENTA Y SEIS PUNTO CINCUENTA Y TRES METROS (86.53 MTS) CON EL SUPERLOTE 2B DE LA MISMA MANZANA. SUR: OCHENTA Y CINCO PUNTO CERO OCHO METROS (85.08 MTS)  CON LA AVENIDA TV SUBA. POR EL ESTE: CIENTO TRES PUNTO NOVENTA Y CINCO METROS (103.95 MTS) CON EL SUPERLOTE 2D DE LA MISMA MANZANA. POR EL OESTE: SESENTA Y UNO PUNTO VEINTICUATRO METROS (61.24 MTS) Y VEINTICUATRO PUNTO CUARENTA Y SIETE METROS (24.47 MTS) CON VÍA V-5 (2b)",
+      "chip": "00000113009"
+    },
+    "prestamo": {
+      "monto": "84.000.000",
+      "plazo_meses": "36",
+      "tasa_mensual": "1.92",
+      "cuota_mensual": "3.253.368",
+      "forma_pago": "Interes y capital",
+      "comision_aluri": "4.200.000",
+      "observaciones": ""
+    },
+    "fecha_creacion": "2026-04-12T15:04:26.488Z"
+  },
+  "enriquecido": {
+    "fecha_firma": "Doce (12) de abril de dos mil veintiséis (2026)",
+    "deudores": [
+      {
+        "nombre_completo": "ALBA YANETH CAMACHO HERRERA",
+        "nombre_completo_mayuscula": "ALBA YANETH CAMACHO HERRERA",
+        "cc": "23.926.821",
+        "cc_expedicion": "PESCA BOYACA",
+        "direccion": "carrera 84#77a-71 Bogotá",
+        "email": "camachoyaneth98@gmail.com",
+        "telefono": "+57 3138909489",
+        "estado_civil": "soltera con unión marital de hecho",
+        "municipio": "PESCA BOYACA"
+      },
+      {
+        "nombre_completo": "JOSE WILSON GOMEZ ZAPATA",
+        "nombre_completo_mayuscula": "JOSE WILSON GOMEZ ZAPATA",
+        "cc": "80.755.506",
+        "cc_expedicion": "BOGOTÁ D.C.",
+        "direccion": "",
+        "email": "",
+        "telefono": "",
+        "estado_civil": "",
+        "municipio": "BOGOTÁ D.C."
+      }
+    ],
+    "codeudores": [],
+    "acreedores": [
+      {
+        "nombre_completo": "SERGIO ANDRÉS VELANDIA CETINA",
+        "nombre_completo_mayuscula": "SERGIO ANDRÉS VELANDIA CETINA",
+        "cc": "1.018.450.779",
+        "cc_expedicion": "Bogotá D.C.",
+        "direccion": "CARRERA 21 # 95 - 63, BOGOTÁ D.C.",
+        "email": "sa.velandia153@gmail.com",
+        "telefono": "+57 3103378408",
+        "estado_civil": "Casado con sociedad conyugal vigente",
+        "participacion_porcentaje": "86.90%",
+        "participacion_monto": 73000000,
+        "participacion_texto": "SETENTA Y TRES MILLONES DE PESOS MONEDA CORRIENTE (COP$73.000.000)",
+        "cuenta_bancaria": "",
+        "cuota_mensual_individual": 4656782,
+        "cuota_mensual_texto": "Cuatro millones seiscientos cincuenta y seis mil setecientos ochenta y dos pesos moneda corriente (COP$4.656.782)",
+        "comision_aluri_individual": 6011765,
+        "monto_inicial": 25550000,
+        "monto_restante": 47450000
+      },
+      {
+        "nombre_completo": "JONATHAN CETINA CUELLAR",
+        "nombre_completo_mayuscula": "JONATHAN CETINA CUELLAR",
+        "cc": "1.026.550.415",
+        "cc_expedicion": "Bogotá D.C.",
+        "direccion": "calle 126 # 48 - 07, Bogotá D.C.",
+        "email": "jonathan.cetina86@gmail.com",
+        "telefono": "+57 3105870085",
+        "estado_civil": "soltero sin unión marital de hecho",
+        "participacion_porcentaje": "13.10%",
+        "participacion_monto": 11000000,
+        "participacion_texto": "ONCE MILLONES DE PESOS MONEDA CORRIENTE (COP$11.000.000)",
+        "cuenta_bancaria": "",
+        "cuota_mensual_individual": 701707,
+        "cuota_mensual_texto": "Setecientos uno mil setecientos siete pesos moneda corriente (COP$701.707)",
+        "comision_aluri_individual": 905882,
+        "monto_inicial": 3850000,
+        "monto_restante": 7150000
+      }
+    ],
+    "inmueble": {
+      "matricula_inmobiliaria": "50N-20617488",
+      "oficina_registro": "",
+      "cedula_catastral": "009248078200000000",
+      "chip": "00000113009",
+      "direccion_corta": "CARRERA 147 NÚMERO 145 - 40",
+      "descripcion_completa": "CASA No. 0018 DEL CONJUNTO RESIDENCIAL QUINTAS DE SANTA RITA IV - PROPIEDAD HORIZONTAL, UBICADO EN LA CIUDAD DE BOGOTÁ D.C. E IDENTIFICADO EN LA NOMENCLATURA URBANA CON EL NÚMERO CIENTO CUARENTA Y CINCO - CUARENTA (145 - 40) DE LA CARRERA CIENTO CUARENTA Y SIETE (147)",
+      "linderos": "NORTE: OCHENTA Y SEIS PUNTO CINCUENTA Y TRES METROS (86.53 MTS) CON EL SUPERLOTE 2B DE LA MISMA MANZANA. SUR: OCHENTA Y CINCO PUNTO CERO OCHO METROS (85.08 MTS)  CON LA AVENIDA TV SUBA. POR EL ESTE: CIENTO TRES PUNTO NOVENTA Y CINCO METROS (103.95 MTS) CON EL SUPERLOTE 2D DE LA MISMA MANZANA. POR EL OESTE: SESENTA Y UNO PUNTO VEINTICUATRO METROS (61.24 MTS) Y VEINTICUATRO PUNTO CUARENTA Y SIETE METROS (24.47 MTS) CON VÍA V-5 (2b)"
+    },
+    "prestamo": {
+      "monto_total": 51000000,
+      "monto_total_texto": "CINCUENTA Y UNO MILLONES DE PESOS MONEDA CORRIENTE (COP$51.000.000)",
+      "monto_inicial_credito": 17850000,
+      "monto_inicial_texto": "DIECISIETE MILLONES OCHOCIENTOS CINCUENTA MIL DE PESOS MONEDA CORRIENTE (COP$17.850.000)",
+      "monto_restante": 33150000,
+      "monto_restante_texto": "TREINTA Y TRES MILLONES CIENTO CINCUENTA MIL DE PESOS MONEDA CORRIENTE (COP$33.150.000)",
+      "plazo_meses": 36,
+      "plazo_texto": "Treinta y seis (36) meses",
+      "tasa_mensual": "1.92",
+      "cuota_mensual_total": 3253368,
+      "cuota_mensual_total_texto": "Tres millones doscientos cincuenta y tres mil trescientos sesenta y ocho pesos moneda corriente (COP$3.253.368)",
+      "comision_aluri_total": 4200000,
+      "comision_aluri_por_acreedor": 2100000,
+      "servicios_aluri_texto": "$2.100.000"
+    }
+  }
+}
