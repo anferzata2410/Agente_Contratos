@@ -347,9 +347,11 @@ def escribir_firma(celda, personas):
     def agregar_parrafo(texto, negrita=False, sin_espacio=False):
         """Agrega un párrafo con un run al final de la celda."""
         p_el = etree.SubElement(tc, f'{NS_W}p')
-        # Eliminar espacio entre parrafos para que queden juntos
+        # Propiedades del parrafo
+        ppr = etree.SubElement(p_el, f'{NS_W}pPr')
+        # keepNext: nunca separar este parrafo del siguiente
+        etree.SubElement(ppr, f'{NS_W}keepNext')
         if sin_espacio:
-            ppr = etree.SubElement(p_el, f'{NS_W}pPr')
             spacing = etree.SubElement(ppr, f'{NS_W}spacing')
             spacing.set(f'{NS_W}after', '0')
             spacing.set(f'{NS_W}before', '0')
