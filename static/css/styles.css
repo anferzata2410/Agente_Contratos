@@ -227,6 +227,14 @@ body {
   padding: 8px 0;
 }
 
+/* ── Botones mostrar secciones ocultas ── */
+.section-toggle-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
 /* ── Barra de acciones ── */
 .actions-bar {
   position: fixed;

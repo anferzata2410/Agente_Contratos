@@ -31,6 +31,23 @@ function iniciarFormularioVacio() {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
+
+  // Ocultar secciones de inmueble y prestamo
+  ocultarSeccion("seccion-inmueble");
+  ocultarSeccion("seccion-prestamo");
+  // Mostrar botones de agregar secciones
+  const btns = document.getElementById("btns-mostrar-secciones");
+  if (btns) btns.style.display = "";
+}
+
+function mostrarSeccion(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = "";
+}
+
+function ocultarSeccion(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = "none";
 }
 
 // ══════════════════════════════════════════════
@@ -151,7 +168,9 @@ function rellenarFormulario(datos) {
     agregarAcreedor();
   }
 
-  // ── Inmueble ──
+  // ── Inmueble (mostrar seccion) ──
+  mostrarSeccion("seccion-inmueble");
+  mostrarSeccion("seccion-prestamo");
   const inm = datos.inmueble || {};
   setVal("inmueble_matricula", inm.matricula_inmobiliaria || "");
   setVal("inmueble_cedula_catastral", inm.cedula_catastral || "");
