@@ -762,8 +762,11 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     for p in doc.paragraphs:
         texto = p.text.strip()
         necesita_salto = False
+        # CLAUSULAS siempre empieza en pagina 2
+        if texto in ("CLÁUSULAS", "CL\u00c1USULAS", "CLAUSULAS"):
+            necesita_salto = True
         # Pagares
-        if texto.startswith("PAGAR") and "No." in texto:
+        elif texto.startswith("PAGAR") and "No." in texto:
             necesita_salto = True
         # Anexo No. 3 titulo (sin ":" para no confundir con la referencia)
         elif texto in ("Anexo No. 3", "Anexo No. 3 "):
