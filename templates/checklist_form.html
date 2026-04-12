@@ -93,19 +93,12 @@
         </div>
       </div>
 
-      <!-- ── Botones para mostrar secciones ocultas (llenado manual) ── -->
-      <div id="btns-mostrar-secciones" class="section-toggle-bar">
-        <button type="button" class="add-btn" onclick="mostrarSeccion('seccion-inmueble')">
-          + Informacion del Inmueble
-        </button>
-        <button type="button" class="add-btn" onclick="mostrarSeccion('seccion-prestamo')">
-          + Condiciones del Prestamo
-        </button>
-      </div>
-
       <!-- ══════════ INMUEBLE ══════════ -->
-      <div class="section" id="seccion-inmueble" style="display:none">
-        <div class="section-header">INFORMACION DEL INMUEBLE</div>
+      <div class="section" id="seccion-inmueble">
+        <div class="section-header">
+          INFORMACION DEL INMUEBLE
+          <span class="badge">OBLIGATORIO</span>
+        </div>
         <div class="section-body">
           <div class="form-grid">
             <div class="field">
@@ -137,7 +130,7 @@
       </div>
 
       <!-- ══════════ CONDICIONES DEL PRESTAMO ══════════ -->
-      <div class="section" id="seccion-prestamo" style="display:none">
+      <div class="section" id="seccion-prestamo">
         <div class="section-header">
           CONDICIONES DEL PRESTAMO
           <span class="badge">OBLIGATORIO</span>
@@ -210,6 +203,6 @@
     </div>
   </div>
 
-  <script src="/static/js/app.js?v=14"></script>
+  <script src="/static/js/app.js?v=15"></script>
 </body>
 </html>
