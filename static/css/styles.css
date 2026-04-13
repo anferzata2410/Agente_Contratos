@@ -8,23 +8,23 @@
 }
 
 :root {
-  --primary: #1a3a5c;
-  --primary-light: #2a5a8c;
-  --accent: #c8a45a;
-  --accent-hover: #b8943a;
-  --bg: #f4f6f9;
+  --primary: #0F172A;
+  --primary-light: #1e293b;
+  --accent: #3be3cf;
+  --accent-hover: #2cc1af;
+  --bg: #F8FAFC;
   --card: #ffffff;
-  --border: #d0d5dd;
-  --text: #1d2939;
-  --text-light: #667085;
-  --danger: #d92d20;
-  --success: #039855;
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-light: #64748b;
+  --danger: #ef4444;
+  --success: #10b981;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
@@ -34,9 +34,21 @@ body {
 .page-header {
   background: var(--primary);
   color: #fff;
-  padding: 24px 0;
-  text-align: center;
+  padding: 16px 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header-logo {
+  height: 44px;
+  filter: brightness(0) invert(1);
 }
 
 .page-header h1 {
@@ -139,8 +151,8 @@ body {
 .field select:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 227, 207, 0.2);
 }
 
 .field textarea {
@@ -178,9 +190,9 @@ body {
 }
 
 .add-btn:hover {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
+  background: var(--accent);
+  color: var(--primary);
+  border-color: var(--accent);
 }
 
 .remove-btn {
@@ -217,6 +229,7 @@ body {
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--accent);
+  color: var(--primary);
 }
 
 /* ── Mensaje de seccion vacia ── */
@@ -265,6 +278,7 @@ body {
 .btn-primary {
   background: var(--accent);
   color: var(--primary);
+  font-weight: 700;
 }
 
 .btn-primary:hover {
@@ -282,12 +296,13 @@ body {
 }
 
 .btn-success {
-  background: var(--success);
-  color: #fff;
+  background: var(--accent);
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .btn-success:hover {
-  background: #027a48;
+  background: var(--accent-hover);
 }
 
 .btn-success:disabled {
@@ -296,12 +311,12 @@ body {
 }
 
 .btn-pdf {
-  background: #b91c1c;
+  background: var(--primary);
   color: #fff;
 }
 
 .btn-pdf:hover {
-  background: #991b1b;
+  background: var(--primary-light);
 }
 
 /* ── Loading overlay ── */
@@ -364,7 +379,8 @@ body {
 }
 
 .toast.success {
-  background: var(--success);
+  background: var(--accent);
+  color: var(--primary);
 }
 
 .toast.error {

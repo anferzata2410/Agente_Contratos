@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="120" height="40">
+  <text x="0" y="32" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold" fill="#1a1a2e">aluri</text>
+  <rect x="93" y="7" width="7" height="7" rx="1" fill="#2dd4a8"/>
+  <rect x="103" y="7" width="7" height="7" rx="1" fill="#2dd4a8" opacity="0.5"/>
+  <rect x="93" y="17" width="7" height="7" rx="1" fill="#2dd4a8" opacity="0.5"/>
+  <rect x="103" y="17" width="7" height="7" rx="1" fill="#2dd4a8"/>
+</svg>
