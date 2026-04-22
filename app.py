@@ -28,7 +28,7 @@ app = Flask(__name__)
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
-TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato_TPL_DOCXTPL_v2.docx"
+TEMPLATE_PATH = BASE_DIR / "Documentacion" / "Contrato_TPL_DOCXTPL_v4.docx"
 TEMPLATE_PATH_LEGACY = BASE_DIR / "Documentacion" / "Contrato_PLANTILLA.docx"
 OUTPUT_DIR = BASE_DIR / "Contratos_Generados"
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -381,6 +381,62 @@ def escribir_firma(celda, personas):
         agregar_parrafo(f"C.C. No. {cc}", negrita=True, sin_espacio=True)
 
 
+def limpiar_firmas_vacias_v4(ruta_docx: Path):
+    """
+    Elimina bloques de firma vacíos en el contrato generado (plantilla v4).
+    Si un nombre de firma está vacío (deudor2, codeudor, acreedor adicional),
+    elimina los párrafos: ___línea___ + nombre_vacío + doc_vacío + No._vacío
+    y los vacíos anteriores.
+    """
+    doc = Document(str(ruta_docx))
+
+    def limpiar_celda(celda):
+        """Elimina bloques de firma donde el nombre esta vacio."""
+        paras = list(celda.paragraphs)
+        i = 0
+        a_eliminar = []
+        while i < len(paras):
+            p = paras[i]
+            txt = p.text.strip()
+            # Detectar linea de firma
+            if "___" in txt and len(txt.replace("_", "").strip()) == 0:
+                # Ver si las siguientes líneas tienen contenido
+                nombre = paras[i + 1].text.strip() if i + 1 < len(paras) else ""
+                doc_identif = paras[i + 2].text.strip() if i + 2 < len(paras) else ""
+                # Si el nombre esta vacio, eliminar bloque entero
+                # (vacios previos + linea + nombre + doc)
+                if not nombre:
+                    # Incluir vacios anteriores (maximo 3)
+                    j = i - 1
+                    while j >= 0 and paras[j].text.strip() == "":
+                        a_eliminar.append(paras[j])
+                        j -= 1
+                    # Incluir la linea y las 2 siguientes
+                    a_eliminar.append(paras[i])  # ___
+                    if i + 1 < len(paras):
+                        a_eliminar.append(paras[i + 1])  # nombre
+                    if i + 2 < len(paras):
+                        a_eliminar.append(paras[i + 2])  # doc
+                    i += 3
+                    continue
+                # Si el doc parece "No." sin cc, tambien limpiar
+                if doc_identif and doc_identif.strip() in ("No.", "  No.", "No."):
+                    a_eliminar.append(paras[i + 2])
+            i += 1
+
+        # Eliminar los parrafos marcados
+        for p in a_eliminar:
+            p._element.getparent().remove(p._element)
+
+    # Aplicar en todas las tablas
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                limpiar_celda(cell)
+
+    doc.save(str(ruta_docx))
+
+
 def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: Path) -> Path:
     """
     Genera el contrato usando docxtpl (Jinja2 en Word) para variables simples,
@@ -417,19 +473,74 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     mt = prest["monto_total"]
     mi = prest["monto_inicial_credito"]
 
+    # Deudor 2 y Nombres Deudores (para header del documento)
+    deudor2 = deudores_extra[0] if deudores_extra else {}
+    nombres_deudores_lista = [d.get("nombre_completo", "") for d in todos_deudores if d.get("nombre_completo")]
+    nombres_deudores_str = " Y ".join(nombres_deudores_lista)
+
     context = {
-        # Fecha
-        "fecha_firma": fecha,
-        "fecha_firma_lower": fecha.lower(),
-        # Deudor principal
+        # ═══ Variables plantilla v4 (nuevas) ═══
+        # Header / título
+        "nombres_deudores": nombres_deudores_str,
+
+        # Deudor 1
         "deudor_nombre": deudor.get("nombre_completo", ""),
+        "deudor_tipo_doc": "C.C.",
         "deudor_cc": deudor.get("cc", ""),
-        "deudor_municipio": deudor.get("municipio", ""),
-        "deudor_estado_civil": deudor.get("estado_civil", ""),
         "deudor_direccion": deudor.get("direccion", ""),
         "deudor_email": deudor.get("email", ""),
         "deudor_telefono": deudor.get("telefono", ""),
-        # Acreedor 1
+
+        # Deudor 2
+        "deudor2_nombre": deudor2.get("nombre_completo", "") if deudor2 else "",
+        "deudor2_tipo_doc": "C.C." if deudor2 else "",
+        "deudor2_cc": deudor2.get("cc", "") if deudor2 else "",
+        "deudor2_email": deudor2.get("email", "") if deudor2 else "",
+        "deudor2_telefono": deudor2.get("telefono", "") if deudor2 else "",
+
+        # Acreedor (único en esta plantilla)
+        "acreedor_nombre": acr1.get("nombre_completo", ""),
+        "acreedor_tipo_doc": "C.C.",
+        "acreedor_cc": acr1.get("cc", ""),
+        "acreedor_email": acr1.get("email", ""),
+        "acreedor_telefono": acr1.get("telefono", ""),
+
+        # Inmueble
+        "matricula_inmobiliaria": inm.get("matricula_inmobiliaria", ""),
+        "oficina_registro": inm.get("oficina_registro", "") or "Bogotá, Zona Sur",
+        "direccion_inmueble": inm.get("direccion_corta", ""),
+
+        # Préstamo - montos (solo valores puros, el template ya tiene " DE PESOS" y "COP$")
+        "monto_credito_letras": numero_a_texto(mt).upper(),
+        "monto_credito_numeros": formato_pesos(mt).lstrip('$'),
+        "tasa_interes": f"{prest['tasa_mensual']} mensual anticipado",
+        "plazo_letras": numero_a_texto(int(prest.get("plazo_meses", 0))).capitalize(),
+        "plazo_numeros": str(prest.get("plazo_meses", "")),
+        "cuota_mensual_letras": numero_a_texto(prest["cuota_mensual_total"]).capitalize(),
+        "cuota_mensual_numeros": formato_pesos(prest['cuota_mensual_total']).lstrip('$'),
+        "servicio_aluri_letras": numero_a_texto(prest["comision_aluri_total"]).upper(),
+        "servicio_aluri_numeros": formato_pesos(prest['comision_aluri_total']).lstrip('$'),
+        "primera_cuota_letras": numero_a_texto(prest["cuota_mensual_total"]).capitalize(),
+        "primera_cuota_numeros": formato_pesos(prest['cuota_mensual_total']).lstrip('$'),
+
+        # Contrato
+        "fecha_firma_contrato": fecha,
+        "fecha_firma_pagare": fecha,
+        "fecha_firma_carta": fecha,
+        "domicilio_contractual": "Bogotá D.C.",
+        "vereda_municipio": deudor.get("municipio", "") or "Bogotá D.C.",
+
+        # Cuentas bancarias
+        "tipo_cuenta_deudor": "Cuenta de ahorros",
+        "cuenta_deudor": "",
+        "tipo_cuenta_acreedor": "Cuenta de ahorros",
+        "cuenta_acreedor": acr1.get("cuenta_bancaria", ""),
+
+        # ═══ Variables legacy (compatibilidad con código antiguo) ═══
+        "fecha_firma": fecha,
+        "fecha_firma_lower": fecha.lower(),
+        "deudor_municipio": deudor.get("municipio", ""),
+        "deudor_estado_civil": deudor.get("estado_civil", ""),
         "acr1_nombre": acr1.get("nombre_completo", ""),
         "acr1_cc": acr1.get("cc", ""),
         "acr1_estado_civil": acr1.get("estado_civil", ""),
@@ -439,7 +550,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         "acr1_cuenta": acr1.get("cuenta_bancaria", ""),
         "acr1_pct": f"{acr1.get('participacion_porcentaje', '')}%".replace("%%", "%"),
         "acr1_aporte": formato_pesos(acr1.get("participacion_monto", 0)),
-        # Acreedor 2
         "acr2_nombre": acr2.get("nombre_completo", "") if acr2 else "",
         "acr2_cc": acr2.get("cc", "") if acr2 else "",
         "acr2_estado_civil": acr2.get("estado_civil", "") if acr2 else "",
@@ -449,7 +559,6 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         "acr2_cuenta": acr2.get("cuenta_bancaria", "") if acr2 else "",
         "acr2_pct": f"{acr2.get('participacion_porcentaje', '')}%".replace("%%", "%") if acr2 else "",
         "acr2_aporte": formato_pesos(acr2.get("participacion_monto", 0)) if acr2 else "",
-        # Montos
         "monto_total_texto": prest["monto_total_texto"],
         "monto_total_mcte": f"{numero_a_texto(mt).upper()} DE PESOS M/CTE (COP{formato_pesos(mt)})",
         "monto_total_pesos": formato_pesos(mt),
@@ -461,15 +570,10 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         "cuota_anticipada_texto": monto_a_texto_legal(prest["cuota_mensual_total"]),
         "comision_aluri_pesos": formato_pesos(prest["comision_aluri_total"]),
         "comision_aluri_mcte": f"{numero_a_texto(prest['comision_aluri_total']).upper()} DE PESOS M/CTE (COP{formato_pesos(prest['comision_aluri_total'])})",
-        # Prestamo
         "tasa_texto": f"{prest['tasa_mensual']} mensual anticipado",
         "plazo_texto": prest["plazo_texto"],
         "plazo_meses": str(prest.get("plazo_meses", "")),
-        # Inmueble
-        "matricula_inmobiliaria": inm.get("matricula_inmobiliaria", ""),
-        "direccion_inmueble": inm.get("direccion_corta", ""),
         "chip": inm.get("chip", ""),
-        # Participacion
         "texto_participacion_acreedores": texto_part,
     }
 
@@ -477,9 +581,14 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
     tpl.render(context)
     tpl.save(str(ruta_output))
 
+    # Si es la plantilla v4: limpiar firmas vacías y retornar
+    if "v4" in str(ruta_template):
+        limpiar_firmas_vacias_v4(ruta_output)
+        return ruta_output
+
     # ═══════════════════════════════════════
     # PASO 2: Post-procesado con python-docx
-    # (partes dinámicas que docxtpl no maneja)
+    # (partes dinámicas que docxtpl no maneja) - solo para plantilla v2
     # ═══════════════════════════════════════
     doc = Document(str(ruta_output))
 
