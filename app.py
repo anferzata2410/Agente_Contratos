@@ -187,12 +187,15 @@ def enriquecer_datos(datos_form: dict) -> dict:
         acreedores.append({
             "nombre_completo": acr.get("nombre", "").upper(),
             "nombre_completo_mayuscula": acr.get("nombre", "").upper(),
+            "tipo_doc": acr.get("tipo_doc", "") or "C.C.",
             "cc": acr.get("cc", ""),
             "cc_expedicion": acr.get("cc_expedicion", ""),
             "direccion": acr.get("direccion", ""),
             "email": acr.get("email", ""),
             "telefono": acr.get("telefono", ""),
             "estado_civil": acr.get("estado_civil", ""),
+            "tipo_cuenta": acr.get("tipo_cuenta", ""),
+            "numero_cuenta": acr.get("numero_cuenta", "") or acr.get("cuenta_bancaria", ""),
             "participacion_porcentaje": pct_raw,
             "participacion_monto": monto_part,
             "participacion_texto": monto_a_texto_legal(monto_part),
@@ -213,6 +216,7 @@ def enriquecer_datos(datos_form: dict) -> dict:
             {
                 "nombre_completo": d.get("nombre", "").upper(),
                 "nombre_completo_mayuscula": d.get("nombre", "").upper(),
+                "tipo_doc": d.get("tipo_doc", "") or "C.C.",
                 "cc": d.get("cc", ""),
                 "cc_expedicion": d.get("cc_expedicion", ""),
                 "direccion": d.get("direccion", ""),
@@ -220,6 +224,8 @@ def enriquecer_datos(datos_form: dict) -> dict:
                 "telefono": d.get("telefono", ""),
                 "estado_civil": d.get("estado_civil", ""),
                 "municipio": d.get("cc_expedicion", ""),
+                "tipo_cuenta": d.get("tipo_cuenta", ""),
+                "numero_cuenta": d.get("numero_cuenta", ""),
             }
             for d in deudores_raw
             if d.get("nombre", "").strip()
@@ -228,12 +234,15 @@ def enriquecer_datos(datos_form: dict) -> dict:
             {
                 "nombre_completo": c.get("nombre", "").upper(),
                 "nombre_completo_mayuscula": c.get("nombre", "").upper(),
+                "tipo_doc": c.get("tipo_doc", "") or "C.C.",
                 "cc": c.get("cc", ""),
                 "cc_expedicion": c.get("cc_expedicion", ""),
                 "direccion": c.get("direccion", ""),
                 "email": c.get("email", ""),
                 "telefono": c.get("telefono", ""),
                 "estado_civil": c.get("estado_civil", ""),
+                "tipo_cuenta": c.get("tipo_cuenta", ""),
+                "numero_cuenta": c.get("numero_cuenta", ""),
             }
             for c in datos_form.get("codeudores", [])
             if c.get("nombre", "").strip()
@@ -241,7 +250,9 @@ def enriquecer_datos(datos_form: dict) -> dict:
         "acreedores": acreedores,
         "inmueble": {
             "matricula_inmobiliaria": inmueble.get("matricula_inmobiliaria", ""),
-            "oficina_registro": "",
+            "oficina_registro": inmueble.get("ciudad_oficina_registro", ""),
+            "ciudad_oficina_registro": inmueble.get("ciudad_oficina_registro", ""),
+            "ciudad_inmueble": inmueble.get("ciudad_inmueble", ""),
             "cedula_catastral": inmueble.get("cedula_catastral", ""),
             "chip": inmueble.get("chip", ""),
             "direccion_corta": inmueble.get("direccion", ""),
@@ -485,7 +496,7 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
 
         # Deudor 1
         "deudor_nombre": deudor.get("nombre_completo", ""),
-        "deudor_tipo_doc": "C.C.",
+        "deudor_tipo_doc": deudor.get("tipo_doc", "") or "C.C.",
         "deudor_cc": deudor.get("cc", ""),
         "deudor_direccion": deudor.get("direccion", ""),
         "deudor_email": deudor.get("email", ""),
@@ -493,21 +504,25 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
 
         # Deudor 2
         "deudor2_nombre": deudor2.get("nombre_completo", "") if deudor2 else "",
-        "deudor2_tipo_doc": "C.C." if deudor2 else "",
+        "deudor2_tipo_doc": (deudor2.get("tipo_doc", "") or "C.C.") if deudor2 else "",
         "deudor2_cc": deudor2.get("cc", "") if deudor2 else "",
+        "deudor2_direccion": deudor2.get("direccion", "") if deudor2 else "",
         "deudor2_email": deudor2.get("email", "") if deudor2 else "",
         "deudor2_telefono": deudor2.get("telefono", "") if deudor2 else "",
 
         # Acreedor (único en esta plantilla)
         "acreedor_nombre": acr1.get("nombre_completo", ""),
-        "acreedor_tipo_doc": "C.C.",
+        "acreedor_tipo_doc": acr1.get("tipo_doc", "") or "C.C.",
         "acreedor_cc": acr1.get("cc", ""),
+        "acreedor_direccion": acr1.get("direccion", ""),
         "acreedor_email": acr1.get("email", ""),
         "acreedor_telefono": acr1.get("telefono", ""),
 
         # Inmueble
         "matricula_inmobiliaria": inm.get("matricula_inmobiliaria", ""),
-        "oficina_registro": inm.get("oficina_registro", "") or "Bogotá, Zona Sur",
+        "oficina_registro": inm.get("ciudad_oficina_registro", "") or inm.get("oficina_registro", "") or "Bogotá, Zona Sur",
+        "ciudad_oficina_registro": inm.get("ciudad_oficina_registro", ""),
+        "ciudad_inmueble": inm.get("ciudad_inmueble", ""),
         "direccion_inmueble": inm.get("direccion_corta", ""),
 
         # Préstamo - montos (solo valores puros, el template ya tiene " DE PESOS" y "COP$")
@@ -531,10 +546,14 @@ def generar_contrato_desde_formulario(datos_enriquecidos: dict, ruta_template: P
         "vereda_municipio": deudor.get("municipio", "") or "Bogotá D.C.",
 
         # Cuentas bancarias
-        "tipo_cuenta_deudor": "Cuenta de ahorros",
-        "cuenta_deudor": "",
-        "tipo_cuenta_acreedor": "Cuenta de ahorros",
-        "cuenta_acreedor": acr1.get("cuenta_bancaria", ""),
+        "tipo_cuenta_deudor": deudor.get("tipo_cuenta", "") or "Cuenta de ahorros",
+        "cuenta_deudor": deudor.get("numero_cuenta", ""),
+        "tipo_cuenta_deudor2": (deudor2.get("tipo_cuenta", "") or "Cuenta de ahorros") if deudor2 else "",
+        "cuenta_deudor2": deudor2.get("numero_cuenta", "") if deudor2 else "",
+        "tipo_cuenta_acreedor": acr1.get("tipo_cuenta", "") or "Cuenta de ahorros",
+        "cuenta_acreedor": acr1.get("numero_cuenta", "") or acr1.get("cuenta_bancaria", ""),
+        "tipo_cuenta_codeudor": (codeudores[0].get("tipo_cuenta", "") or "Cuenta de ahorros") if codeudores else "",
+        "cuenta_codeudor": codeudores[0].get("numero_cuenta", "") if codeudores else "",
 
         # ═══ Variables legacy (compatibilidad con código antiguo) ═══
         "fecha_firma": fecha,
@@ -1020,11 +1039,23 @@ def parsear_checklist_docx(ruta: Path) -> dict:
     def extraer_persona_de_bloque(bloque_texto):
         """Extrae los datos de una persona desde un bloque de texto."""
         nombre = buscar_campo("Nombre", bloque_texto)
-        if not nombre or re.match(r"^(CC|Cedula|Direcci|Correo|Tel|Estado|Participaci)", nombre, re.IGNORECASE):
+        if not nombre or re.match(r"^(CC|Cedula|Direcci|Correo|Tel|Estado|Participaci|Tipo|Numero)", nombre, re.IGNORECASE):
             return None  # Bloque vacio
 
-        cc_raw = buscar(r"CC\.?\s*(?:del\s*Deudor)?\s*:\s*([^\n]+)", bloque_texto)
-        cc, cc_exp = separar_cc_y_expedicion(limpiar_campo_checklist(cc_raw))
+        # Tipo de documento (formato nuevo) - ej: "Tipo de documento: C.C."
+        # Usamos [ \t]* para que no cruce saltos de linea cuando el campo esta vacio
+        tipo_doc = limpiar_campo_checklist(buscar(r"Tipo\s*de\s*documento[ \t]*:[ \t]*([^\n]*)", bloque_texto))
+        if tipo_doc:
+            tipo_doc = tipo_doc.rstrip('.').strip()
+
+        # Numero de documento (formato nuevo) o CC del Deudor (formato viejo)
+        numero_doc_raw = buscar(r"Numero\s*Documento\s*:\s*([^\n]+)", bloque_texto)
+        if not numero_doc_raw:
+            numero_doc_raw = buscar(r"CC\.?\s*(?:del\s*Deudor)?\s*:\s*([^\n]+)", bloque_texto)
+        if not numero_doc_raw:
+            numero_doc_raw = buscar(r"[Cc].dula\s*:\s*([^\n]+)", bloque_texto)
+        cc, cc_exp = separar_cc_y_expedicion(limpiar_campo_checklist(numero_doc_raw))
+
         direccion = limpiar_campo_checklist(buscar(r"Direcci.n\s*(?:de\s*)?notificaci.n\s*(?:Deudor)?\s*:\s*([^\n]+)", bloque_texto))
         email = limpiar_campo_checklist(buscar(r"Correo\s*(?:electr.nico)?\s*(?:Deudor)?\s*:\s*([^\n]+)", bloque_texto))
         telefono = limpiar_campo_checklist(buscar(r"Tel.fono\s*(?:Deudor)?\s*:\s*([^\n]+)", bloque_texto))
@@ -1032,8 +1063,13 @@ def parsear_checklist_docx(ruta: Path) -> dict:
         part_monto_raw = buscar(r"Participaci.n\s*\$+\s*:\s*([^\n]+)", bloque_texto)
         part_pct = buscar(r"Participaci.n\s*%\s*:\s*([^\n]+)", bloque_texto)
 
+        # Datos bancarios - Tipo y numero de cuenta
+        tipo_cuenta = limpiar_campo_checklist(buscar(r"Tipo\s*de\s*cuenta[ \t]*:[ \t]*([^\n]*)", bloque_texto))
+        numero_cuenta = limpiar_campo_checklist(buscar(r"N.mero\s*de\s*cuenta[ \t]*:[ \t]*([^\n]*)", bloque_texto))
+
         return {
             "nombre": nombre,
+            "tipo_doc": tipo_doc,
             "cc": cc,
             "cc_expedicion": cc_exp,
             "direccion": direccion,
@@ -1042,6 +1078,8 @@ def parsear_checklist_docx(ruta: Path) -> dict:
             "estado_civil": civil,
             "participacion_monto": formatear_monto_display(limpiar_campo_checklist(part_monto_raw).replace("$", "").strip()),
             "participacion_porcentaje": limpiar_campo_checklist(part_pct),
+            "tipo_cuenta": tipo_cuenta,
+            "numero_cuenta": numero_cuenta,
         }
 
     # Cortar el texto entre el inicio y "Acreedor 1" para obtener
@@ -1105,11 +1143,19 @@ def parsear_checklist_docx(ruta: Path) -> dict:
         if not nombre:
             continue  # Acreedor vacio
         # Descartar si el "nombre" es en realidad otra etiqueta (acreedor vacio)
-        if re.match(r"^(Cedula|Direccion|Correo|Telefono|Estado|Participacion)", nombre, re.IGNORECASE):
+        if re.match(r"^(Cedula|Direccion|Correo|Telefono|Estado|Participacion|Tipo|Numero)", nombre, re.IGNORECASE):
             continue
 
-        cc_raw = buscar(r"[Cc].dula\s*:\s*(.+)", bloque)
-        cc, cc_exp = separar_cc_y_expedicion(cc_raw)
+        # Tipo de documento (formato nuevo)
+        tipo_doc = limpiar_campo_checklist(buscar(r"Tipo\s*de\s*documento[ \t]*:[ \t]*([^\n]*)", bloque))
+        if tipo_doc:
+            tipo_doc = tipo_doc.rstrip('.').strip()
+
+        # Numero de documento (formato nuevo) o Cédula (formato viejo)
+        numero_doc_raw = buscar(r"Numero\s*Documento\s*:\s*([^\n]+)", bloque)
+        if not numero_doc_raw:
+            numero_doc_raw = buscar(r"[Cc].dula\s*:\s*([^\n]+)", bloque)
+        cc, cc_exp = separar_cc_y_expedicion(limpiar_campo_checklist(numero_doc_raw))
 
         direccion = buscar(r"[Dd]irecci.n\s*notificaci?o?n\s*:\s*(.+)", bloque)
         email = buscar(r"[Cc]orreo\s*:\s*(.+)", bloque)
@@ -1118,8 +1164,13 @@ def parsear_checklist_docx(ruta: Path) -> dict:
         part_monto = buscar(r"[Pp]articipaci.n\s*\$+\s*:\s*(.+)", bloque).replace("$", "").replace(" ", "").strip()
         part_pct = buscar(r"[Pp]articipaci.n\s*%\s*:\s*(.+)", bloque)
 
+        # Datos bancarios del acreedor
+        tipo_cuenta_acr = limpiar_campo_checklist(buscar(r"Tipo\s*de\s*cuenta[ \t]*:[ \t]*([^\n]*)", bloque))
+        numero_cuenta_acr = limpiar_campo_checklist(buscar(r"N.mero\s*de\s*cuenta[ \t]*:[ \t]*([^\n]*)", bloque))
+
         acreedores.append({
             "nombre": nombre,
+            "tipo_doc": tipo_doc,
             "cc": cc,
             "cc_expedicion": cc_exp,
             "direccion": direccion,
@@ -1128,7 +1179,9 @@ def parsear_checklist_docx(ruta: Path) -> dict:
             "estado_civil": civil,
             "participacion_monto": formatear_monto_display(part_monto),
             "participacion_porcentaje": part_pct,
-            "cuenta_bancaria": "",
+            "tipo_cuenta": tipo_cuenta_acr,
+            "numero_cuenta": numero_cuenta_acr,
+            "cuenta_bancaria": numero_cuenta_acr,  # legacy
         })
 
     # ── Inmueble ──
@@ -1145,6 +1198,9 @@ def parsear_checklist_docx(ruta: Path) -> dict:
     inmueble_dir = buscar(r"Direcci.n del [Ii]nmueble\s*:\s*(.+)", bloque_inmueble)
     inmueble_desc = buscar(r"Descripci.n del [Ii]nmueble\s*:\s*(.+)", bloque_inmueble)
     inmueble_linderos = buscar(r"Linderos\s*:\s*(.+)", bloque_inmueble)
+    # Nuevas variables: ciudades
+    ciudad_oficina_registro = limpiar_campo_checklist(buscar(r"Ciudad\s*Oficina\s*de\s*Registro\s*:\s*([^\n]+)", bloque_inmueble))
+    ciudad_inmueble = limpiar_campo_checklist(buscar(r"Ciudad\s*del\s*[Ii]nmueble\s*:\s*([^\n]+)", bloque_inmueble))
 
     # Concatenar lineas de linderos (suelen estar en multiples parrafos)
     linderos_lineas = []
@@ -1204,6 +1260,8 @@ def parsear_checklist_docx(ruta: Path) -> dict:
             "direccion": inmueble_dir,
             "descripcion": inmueble_desc,
             "linderos": inmueble_linderos,
+            "ciudad_oficina_registro": ciudad_oficina_registro,
+            "ciudad_inmueble": ciudad_inmueble,
         },
         "prestamo": {
             "monto": formatear_monto_display(monto),

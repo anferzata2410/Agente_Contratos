@@ -95,6 +95,7 @@ function rellenarFormulario(datos) {
       const idx = contadorDeudores;
       deudContainer.insertAdjacentHTML("beforeend", crearCardDeudor(idx));
       setVal(`deudor_${idx}_nombre`, d.nombre || "");
+      setVal(`deudor_${idx}_tipo_doc`, normalizarTipoDoc(d.tipo_doc));
       setVal(`deudor_${idx}_cc`, d.cc || "");
       setVal(`deudor_${idx}_cc_expedicion`, d.cc_expedicion || "");
       setVal(`deudor_${idx}_direccion`, d.direccion || "");
@@ -103,6 +104,8 @@ function rellenarFormulario(datos) {
       setVal(`deudor_${idx}_estado_civil`, d.estado_civil || "");
       setVal(`deudor_${idx}_participacion_monto`, d.participacion_monto || "");
       setVal(`deudor_${idx}_participacion_porcentaje`, d.participacion_porcentaje || "");
+      setVal(`deudor_${idx}_tipo_cuenta`, normalizarTipoCuenta(d.tipo_cuenta));
+      setVal(`deudor_${idx}_numero_cuenta`, d.numero_cuenta || "");
     });
   } else {
     agregarDeudor();
@@ -119,12 +122,15 @@ function rellenarFormulario(datos) {
     const idx = contadorCodeudores;
     codContainer.insertAdjacentHTML("beforeend", crearCardPersona("codeudor", idx, true));
     setVal(`codeudor_${idx}_nombre`, cod.nombre || "");
+    setVal(`codeudor_${idx}_tipo_doc`, normalizarTipoDoc(cod.tipo_doc));
     setVal(`codeudor_${idx}_cc`, cod.cc || "");
     setVal(`codeudor_${idx}_cc_expedicion`, cod.cc_expedicion || "");
     setVal(`codeudor_${idx}_direccion`, cod.direccion || "");
     setVal(`codeudor_${idx}_email`, cod.email || "");
     setVal(`codeudor_${idx}_telefono`, cod.telefono || "");
     setVal(`codeudor_${idx}_estado_civil`, cod.estado_civil || "");
+    setVal(`codeudor_${idx}_tipo_cuenta`, normalizarTipoCuenta(cod.tipo_cuenta));
+    setVal(`codeudor_${idx}_numero_cuenta`, cod.numero_cuenta || "");
   });
 
   // ── Acreedores ──
@@ -139,6 +145,7 @@ function rellenarFormulario(datos) {
       const idx = contadorAcreedores;
       container.insertAdjacentHTML("beforeend", crearCardPersona("acreedor", idx, true));
       setVal(`acreedor_${idx}_nombre`, acr.nombre || "");
+      setVal(`acreedor_${idx}_tipo_doc`, normalizarTipoDoc(acr.tipo_doc));
       setVal(`acreedor_${idx}_cc`, acr.cc || "");
       setVal(`acreedor_${idx}_cc_expedicion`, acr.cc_expedicion || "");
       setVal(`acreedor_${idx}_direccion`, acr.direccion || "");
@@ -147,7 +154,8 @@ function rellenarFormulario(datos) {
       setVal(`acreedor_${idx}_estado_civil`, acr.estado_civil || "");
       setVal(`acreedor_${idx}_participacion_monto`, acr.participacion_monto || "");
       setVal(`acreedor_${idx}_participacion_porcentaje`, acr.participacion_porcentaje || "");
-      setVal(`acreedor_${idx}_cuenta_bancaria`, acr.cuenta_bancaria || "");
+      setVal(`acreedor_${idx}_tipo_cuenta`, normalizarTipoCuenta(acr.tipo_cuenta));
+      setVal(`acreedor_${idx}_numero_cuenta`, acr.numero_cuenta || acr.cuenta_bancaria || "");
     });
   } else {
     agregarAcreedor();
@@ -160,6 +168,8 @@ function rellenarFormulario(datos) {
   setVal("inmueble_matricula", inm.matricula_inmobiliaria || "");
   setVal("inmueble_cedula_catastral", inm.cedula_catastral || "");
   setVal("inmueble_chip", inm.chip || "");
+  setVal("inmueble_ciudad_oficina_registro", inm.ciudad_oficina_registro || "");
+  setVal("inmueble_ciudad_inmueble", inm.ciudad_inmueble || "");
   setVal("inmueble_direccion", inm.direccion || "");
   setVal("inmueble_descripcion", inm.descripcion || "");
   setVal("inmueble_linderos", inm.linderos || "");
@@ -189,6 +199,7 @@ function recopilarDeudores() {
     if (!el) continue;
     deudores.push({
       nombre: val(`deudor_${i}_nombre`),
+      tipo_doc: val(`deudor_${i}_tipo_doc`),
       cc: val(`deudor_${i}_cc`),
       cc_expedicion: val(`deudor_${i}_cc_expedicion`),
       direccion: val(`deudor_${i}_direccion`),
@@ -197,6 +208,8 @@ function recopilarDeudores() {
       estado_civil: val(`deudor_${i}_estado_civil`),
       participacion_monto: val(`deudor_${i}_participacion_monto`),
       participacion_porcentaje: val(`deudor_${i}_participacion_porcentaje`),
+      tipo_cuenta: val(`deudor_${i}_tipo_cuenta`),
+      numero_cuenta: val(`deudor_${i}_numero_cuenta`),
     });
   }
   return deudores;
@@ -217,6 +230,8 @@ function recopilarDatos() {
       descripcion: val("inmueble_descripcion"),
       linderos: val("inmueble_linderos"),
       chip: val("inmueble_chip"),
+      ciudad_oficina_registro: val("inmueble_ciudad_oficina_registro"),
+      ciudad_inmueble: val("inmueble_ciudad_inmueble"),
     },
     prestamo: {
       monto: val("prestamo_monto"),
@@ -238,6 +253,7 @@ function recopilarAcreedores() {
     const idx = i + 1;
     acreedores.push({
       nombre: val(`acreedor_${idx}_nombre`),
+      tipo_doc: val(`acreedor_${idx}_tipo_doc`),
       cc: val(`acreedor_${idx}_cc`),
       cc_expedicion: val(`acreedor_${idx}_cc_expedicion`),
       direccion: val(`acreedor_${idx}_direccion`),
@@ -246,7 +262,8 @@ function recopilarAcreedores() {
       estado_civil: val(`acreedor_${idx}_estado_civil`),
       participacion_monto: val(`acreedor_${idx}_participacion_monto`),
       participacion_porcentaje: val(`acreedor_${idx}_participacion_porcentaje`),
-      cuenta_bancaria: val(`acreedor_${idx}_cuenta_bancaria`),
+      tipo_cuenta: val(`acreedor_${idx}_tipo_cuenta`),
+      numero_cuenta: val(`acreedor_${idx}_numero_cuenta`),
     });
   });
   return acreedores;
@@ -259,12 +276,15 @@ function recopilarPersonas(prefijo, total) {
     if (!el) continue;
     personas.push({
       nombre: val(`${prefijo}_${i}_nombre`),
+      tipo_doc: val(`${prefijo}_${i}_tipo_doc`),
       cc: val(`${prefijo}_${i}_cc`),
       cc_expedicion: val(`${prefijo}_${i}_cc_expedicion`),
       direccion: val(`${prefijo}_${i}_direccion`),
       email: val(`${prefijo}_${i}_email`),
       telefono: val(`${prefijo}_${i}_telefono`),
       estado_civil: val(`${prefijo}_${i}_estado_civil`),
+      tipo_cuenta: val(`${prefijo}_${i}_tipo_cuenta`),
+      numero_cuenta: val(`${prefijo}_${i}_numero_cuenta`),
     });
   }
   return personas;
@@ -321,6 +341,14 @@ function mostrarInmueble() {
       <div class="field">
         <label>Codigo CHIP</label>
         <input type="text" id="inmueble_chip" placeholder="AAA0000XXXX">
+      </div>
+      <div class="field">
+        <label>Ciudad Oficina de Registro <span class="required">*</span></label>
+        <input type="text" id="inmueble_ciudad_oficina_registro" placeholder="Bogota">
+      </div>
+      <div class="field">
+        <label>Ciudad del Inmueble <span class="required">*</span></label>
+        <input type="text" id="inmueble_ciudad_inmueble" placeholder="Bogota">
       </div>
       <div class="field full-width">
         <label>Direccion del inmueble <span class="required">*</span></label>
@@ -454,7 +482,17 @@ function crearCardDeudor(idx) {
           <input type="text" id="deudor_${idx}_nombre" placeholder="Nombre completo" required>
         </div>
         <div class="field">
-          <label>No. Cedula <span class="required">*</span></label>
+          <label>Tipo de documento</label>
+          <select id="deudor_${idx}_tipo_doc">
+            <option value="C.C.">C.C.</option>
+            <option value="C.E.">C.E.</option>
+            <option value="Pasaporte">Pasaporte</option>
+            <option value="T.I.">T.I.</option>
+            <option value="NIT">NIT</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>No. Documento <span class="required">*</span></label>
           <input type="text" id="deudor_${idx}_cc" placeholder="XX.XXX.XXX">
         </div>
         <div class="field">
@@ -485,6 +523,18 @@ function crearCardDeudor(idx) {
           <label>Participacion %</label>
           <input type="text" id="deudor_${idx}_participacion_porcentaje" placeholder="100%">
         </div>
+        <div class="field">
+          <label>Tipo de cuenta</label>
+          <select id="deudor_${idx}_tipo_cuenta">
+            <option value="">Seleccionar...</option>
+            <option value="Cuenta de ahorros">Cuenta de ahorros</option>
+            <option value="Cuenta corriente">Cuenta corriente</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Numero de cuenta</label>
+          <input type="text" id="deudor_${idx}_numero_cuenta" placeholder="XXXXXXXXXX">
+        </div>
       </div>
     </div>
   `;
@@ -493,6 +543,21 @@ function crearCardDeudor(idx) {
 function crearCardPersona(tipo, idx, conEliminar) {
   const label = tipo === "acreedor" ? `Acreedor ${idx}` : `Codeudor ${idx}`;
   const esAcreedor = tipo === "acreedor";
+
+  const cuentaFields = `
+      <div class="field">
+        <label>Tipo de cuenta</label>
+        <select id="${tipo}_${idx}_tipo_cuenta">
+          <option value="">Seleccionar...</option>
+          <option value="Cuenta de ahorros">Cuenta de ahorros</option>
+          <option value="Cuenta corriente">Cuenta corriente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Numero de cuenta</label>
+        <input type="text" id="${tipo}_${idx}_numero_cuenta" placeholder="XXXXXXXXXX">
+      </div>
+  `;
 
   let extraFields = "";
   if (esAcreedor) {
@@ -505,11 +570,10 @@ function crearCardPersona(tipo, idx, conEliminar) {
         <label>Participacion %</label>
         <input type="text" id="${tipo}_${idx}_participacion_porcentaje" placeholder="50%">
       </div>
-      <div class="field full-width">
-        <label>Cuenta bancaria</label>
-        <input type="text" id="${tipo}_${idx}_cuenta_bancaria" placeholder="Cuenta de ahorros No. XXXXX de Bancolombia">
-      </div>
+      ${cuentaFields}
     `;
+  } else {
+    extraFields = cuentaFields;
   }
 
   const removeBtn = conEliminar
@@ -525,7 +589,17 @@ function crearCardPersona(tipo, idx, conEliminar) {
           <input type="text" id="${tipo}_${idx}_nombre" placeholder="Nombre completo" required>
         </div>
         <div class="field">
-          <label>No. Cedula <span class="required">*</span></label>
+          <label>Tipo de documento</label>
+          <select id="${tipo}_${idx}_tipo_doc">
+            <option value="C.C.">C.C.</option>
+            <option value="C.E.">C.E.</option>
+            <option value="Pasaporte">Pasaporte</option>
+            <option value="T.I.">T.I.</option>
+            <option value="NIT">NIT</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>No. Documento <span class="required">*</span></label>
           <input type="text" id="${tipo}_${idx}_cc" placeholder="XX.XXX.XXX">
         </div>
         <div class="field">
@@ -707,6 +781,29 @@ function limpiarFormulario() {
 function val(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : "";
+}
+
+// Normaliza tipo de documento parseado del checklist a los valores del select
+// Ej: "C.C", "CC", "cedula" -> "C.C."
+function normalizarTipoDoc(raw) {
+  if (!raw) return "C.C.";
+  const s = String(raw).toLowerCase().replace(/[\s.]/g, "");
+  if (s.includes("cedulaextranj") || s === "ce") return "C.E.";
+  if (s === "cc" || s.includes("cedulaciudadan") || s.includes("cedula")) return "C.C.";
+  if (s.includes("pasaporte")) return "Pasaporte";
+  if (s === "ti" || s.includes("tarjetaidentidad")) return "T.I.";
+  if (s === "nit") return "NIT";
+  return "C.C.";
+}
+
+// Normaliza tipo de cuenta parseado del checklist al valor del select
+// Ej: "Ahorros", "ahorro", "Cuenta Ahorros" -> "Cuenta de ahorros"
+function normalizarTipoCuenta(raw) {
+  if (!raw) return "";
+  const s = String(raw).toLowerCase();
+  if (s.includes("ahorr")) return "Cuenta de ahorros";
+  if (s.includes("corriente")) return "Cuenta corriente";
+  return "";
 }
 
 function setVal(id, valor) {
